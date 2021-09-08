@@ -7,6 +7,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,9 +16,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.Dp
@@ -130,13 +133,12 @@ class LoadingUseCaseImpl @Inject constructor() : LoadingUseCase {
          */
 
         Row {
-            Spacer(
-                modifier = modifier
-                    .height(Dp(150F))
-                    .width(Dp(150F))
-                    .background(brush = brush)
-            )
-            Column {
+            Column(
+                modifier = Modifier
+                    .weight(2f)
+                    .height(Dp(150F)),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
                 Spacer(
                     modifier = modifier
                         .padding(
@@ -157,6 +159,15 @@ class LoadingUseCaseImpl @Inject constructor() : LoadingUseCase {
                         .background(brush = brush)
                 )
             }
+
+            Spacer(
+                modifier = modifier
+                    .height(Dp(150F))
+                    .width(Dp(150F))
+                    .background(brush = brush)
+                    .padding(Dp(4f))
+                    .clip(RoundedCornerShape(Dp(8F)))
+            )
 
         }
         Spacer(modifier = modifier.height(Dp(8f)))

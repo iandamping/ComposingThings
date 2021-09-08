@@ -8,7 +8,7 @@ import com.junemon.compose_stable.core.domain.model.response.News
  * Indonesia.
  */
 object DummyModel {
-    val DUMMY_NEWS_1 = News("a","a","a","a","a","a","a")
+    val DUMMY_NEWS_1 = News("a","a","aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","a","a","a","a")
     val DUMMY_NEWS_2 = News("b","b","b","b","b","b","b")
     val LIST_DUMMY_NEWS = listOf<News>(DUMMY_NEWS_1, DUMMY_NEWS_2)
 }

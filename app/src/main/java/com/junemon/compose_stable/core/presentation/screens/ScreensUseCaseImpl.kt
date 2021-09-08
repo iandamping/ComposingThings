@@ -2,6 +2,7 @@ package com.junemon.compose_stable.core.presentation.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,9 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
@@ -39,16 +42,13 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                 Row(modifier.clickable {
                     newsSelect(singleNews)
                 }) {
-                    Image(
-                        painter = rememberImagePainter(singleNews.newsImage, builder = {
-                            crossfade(true)
-                        }), contentDescription = null,
-                        contentScale = ContentScale.Crop,
+
+                    Column(
                         modifier = Modifier
-                            .height(Dp(150F))
-                            .width(Dp(150F))
-                    )
-                    Column {
+                            .weight(2f)
+                            .height(Dp(150F)),
+                        verticalArrangement = Arrangement.SpaceBetween
+                    ) {
                         Text(
                             text = singleNews.newsTitle,
                             color = Color.Black,
@@ -67,8 +67,22 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                         )
                     }
 
+                    Image(
+                        painter = rememberImagePainter(singleNews.newsImage, builder = {
+                            crossfade(true)
+                        }), contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = modifier
+                            .height(Dp(150F))
+                            .width(Dp(150F))
+                            .weight(1f)
+                            .padding(Dp(4f))
+                            .clip(RoundedCornerShape(Dp(8F)))
+
+                    )
+
                 }
-                Spacer(modifier = Modifier.height(Dp(8f)))
+                Spacer(modifier = modifier.height(Dp(8f)))
 
             }
         }
@@ -81,21 +95,21 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
             Image(
                 painter = rememberImagePainter(news.newsImage),
                 contentDescription = null,
-                modifier = Modifier
+                modifier = modifier
                     .height(Dp(300F))
                     .fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(Dp(8f)))
+            Spacer(modifier = modifier.height(Dp(8f)))
             Text(
                 text = news.newsTitle,
                 color = Color.Black,
                 fontSize = TextUnit(value = 22F, TextUnitType.Sp)
             )
-            Spacer(modifier = Modifier.height(Dp(8f)))
+            Spacer(modifier = modifier.height(Dp(8f)))
             Text(
                 text = news.newsDescription, fontSize = TextUnit(value = 16F, TextUnitType.Sp),
-                modifier = Modifier.fillMaxWidth()
+                modifier = modifier.fillMaxWidth()
             )
         }
     }
