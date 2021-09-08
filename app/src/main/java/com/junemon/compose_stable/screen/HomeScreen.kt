@@ -1,6 +1,7 @@
 package com.junemon.compose_stable.screen
 
 import android.widget.Toast
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -10,8 +11,6 @@ import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.navigation.NavHostController
 import com.junemon.compose_stable.core.domain.model.DomainResult
 import com.junemon.compose_stable.core.domain.model.response.News
-import com.junemon.compose_stable.core.presentation.common.LottieLoading
-import com.junemon.compose_stable.core.presentation.screens.ListNews
 import timber.log.Timber
 
 /**
@@ -20,6 +19,7 @@ import timber.log.Timber
  * Indonesia.
  */
 @ExperimentalUnitApi
+@ExperimentalAnimationApi
 @Composable
 fun ComposeHomeScreen(
     viewModel: NewsViewModel,
@@ -29,7 +29,7 @@ fun ComposeHomeScreen(
     val result: DomainResult<List<News>> by viewModel.getNews()
         .observeAsState(initial = DomainResult.Loading)
     when (result) {
-        is DomainResult.Data -> ListNews(
+        is DomainResult.Data -> viewModel.ListNews(
             news = (result as DomainResult.Data<List<News>>).data,
             modifier = modifier,
             newsSelect = {
@@ -42,6 +42,6 @@ fun ComposeHomeScreen(
             Toast.LENGTH_SHORT
         ).show()
 
-        DomainResult.Loading -> LottieLoading()
+        DomainResult.Loading -> viewModel.Shimmer(itemSize = 4, modifier = modifier)
     }
 }
