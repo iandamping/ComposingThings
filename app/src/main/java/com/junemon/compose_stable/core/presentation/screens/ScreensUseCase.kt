@@ -18,5 +18,13 @@ interface ScreensUseCase {
 
     @ExperimentalUnitApi
     @Composable
-    fun SingleNews(news: News, modifier: Modifier)
+    fun NewsDetail(news: News, modifier: Modifier)
+
+    @ExperimentalUnitApi
+    @Composable
+    fun DefaultToolbar(navigationClick: () -> Unit, modifier: Modifier)
+
+    @ExperimentalUnitApi
+    @Composable
+    fun NewsDetailToolbar(news: News, navigationClick: () -> Unit, actionClick: () -> Unit, modifier: Modifier)
 }

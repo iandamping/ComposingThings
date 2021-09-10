@@ -41,8 +41,8 @@ class NewsViewModel @Inject constructor(
 
     @ExperimentalUnitApi
     @Composable
-    fun SingleNews(news: News, modifier: Modifier) =
-        screensUseCase.SingleNews(
+    fun NewsDetail(news: News, modifier: Modifier) =
+        screensUseCase.NewsDetail(
             news = news,
             modifier = modifier
         )

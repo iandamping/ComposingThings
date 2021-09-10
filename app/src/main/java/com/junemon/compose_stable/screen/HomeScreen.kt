@@ -42,6 +42,6 @@ fun ComposeHomeScreen(
             Toast.LENGTH_SHORT
         ).show()
 
-        DomainResult.Loading -> viewModel.Shimmer(itemSize = 4, modifier = modifier)
+        DomainResult.Loading -> viewModel.LottieCirclingLoading()
     }
 }
