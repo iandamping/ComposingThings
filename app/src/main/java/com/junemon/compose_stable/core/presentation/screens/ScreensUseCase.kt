@@ -1,5 +1,6 @@
 package com.junemon.compose_stable.core.presentation.screens
 
+import androidx.activity.OnBackPressedDispatcher
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.ExperimentalUnitApi
@@ -18,13 +19,17 @@ interface ScreensUseCase {
 
     @ExperimentalUnitApi
     @Composable
-    fun NewsDetail(news: News, modifier: Modifier)
+    fun NewsDetail(
+        news: News,
+        navigationClick: () -> Unit,
+        actionClick: () -> Unit,
+        modifier: Modifier
+    )
 
-    @ExperimentalUnitApi
     @Composable
-    fun DefaultToolbar(navigationClick: () -> Unit, modifier: Modifier)
-
-    @ExperimentalUnitApi
-    @Composable
-    fun NewsDetailToolbar(news: News, navigationClick: () -> Unit, actionClick: () -> Unit, modifier: Modifier)
+    fun BackHandler(
+        backDispatcher: OnBackPressedDispatcher,
+        enabled: Boolean,
+        onBack: () -> Unit
+    )
 }

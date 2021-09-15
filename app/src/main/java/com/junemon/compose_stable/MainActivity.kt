@@ -21,9 +21,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val navController = rememberNavController()
             ComposingWithTheme {
-                NavigationHost(navController = navController, viewModel = vm)
+                val navController = rememberNavController()
+                NavigationHost(navController = navController,viewModel = vm)
             }
         }
     }

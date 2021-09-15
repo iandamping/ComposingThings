@@ -1,6 +1,8 @@
 package com.junemon.compose_stable.screen
 
+import android.content.Intent
 import android.widget.Toast
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -8,10 +10,12 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.ExperimentalUnitApi
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavHostController
+import com.google.gson.Gson
 import com.junemon.compose_stable.core.domain.model.DomainResult
 import com.junemon.compose_stable.core.domain.model.response.News
-import timber.log.Timber
+import com.junemon.compose_stable.navigation.ScreensNavigation
 
 /**
  * Created by Ian Damping on 06,September,2021
@@ -33,7 +37,9 @@ fun ComposeHomeScreen(
             news = (result as DomainResult.Data<List<News>>).data,
             modifier = modifier,
             newsSelect = {
-                Timber.e("selected news : ${it.newsAuthor}")
+                viewModel.setNewsDetail(Gson().toJson(it))
+                navController.navigate(ScreensNavigation.LoadDetail().name)
+                // navigateToDetailNews(navController = navController, newsDetail = it.sourceName)
             })
 
         is DomainResult.Error -> Toast.makeText(
@@ -44,4 +50,21 @@ fun ComposeHomeScreen(
 
         DomainResult.Loading -> viewModel.LottieCirclingLoading()
     }
+
+    val backDispatcher = checkNotNull(LocalOnBackPressedDispatcherOwner.current) {
+        "No OnBackPressedDispatcherOwner was provided via LocalOnBackPressedDispatcherOwner"
+    }.onBackPressedDispatcher
+    // val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
+
+    viewModel.BackHandler(backDispatcher = backDispatcher) {
+        val intent = Intent(Intent.ACTION_MAIN)
+        intent.addCategory(Intent.CATEGORY_HOME)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(context, intent, null)
+    }
+}
+
+private fun navigateToDetailNews(navController: NavHostController, newsDetail: String) {
+    navController.navigate("${ScreensNavigation.LoadDetail().name}/${newsDetail}")
 }

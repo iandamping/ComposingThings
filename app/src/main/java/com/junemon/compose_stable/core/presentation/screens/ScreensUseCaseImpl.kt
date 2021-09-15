@@ -1,24 +1,31 @@
 package com.junemon.compose_stable.core.presentation.screens
 
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.OnBackPressedDispatcher
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -27,8 +34,12 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -66,33 +77,102 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
 
     @ExperimentalUnitApi
     @Composable
-    override fun NewsDetail(news: News, modifier: Modifier) {
-        Column(modifier = modifier.padding(Dp(8F))) {
-            Image(
-                painter = rememberImagePainter(news.newsImage),
-                contentDescription = null,
+    override fun NewsDetail(
+        news: News,
+        navigationClick: () -> Unit,
+        actionClick: () -> Unit,
+        modifier: Modifier
+    ) {
+        NewsDetailToolbar(
+            toolBarText = news.sourceName,
+            navigationClick = navigationClick,
+            actionClick = actionClick
+        ) {
+            Column(
                 modifier = modifier
-                    .height(Dp(300F))
-                    .fillMaxWidth()
-            )
+                    .verticalScroll(rememberScrollState())
+                    .padding(8.dp)
+                    .fillMaxSize()
+            ) {
+                Text(
+                    style = MaterialTheme.typography.h6,
+                    text = news.newsTitle
+                )
+                Spacer(modifier = modifier.height(12.dp))
 
-            Spacer(modifier = modifier.height(Dp(8f)))
-            Text(
-                text = news.newsTitle,
-                color = Color.Black,
-                fontSize = TextUnit(value = 22F, TextUnitType.Sp)
-            )
-            Spacer(modifier = modifier.height(Dp(8f)))
-            Text(
-                text = news.newsDescription, fontSize = TextUnit(value = 16F, TextUnitType.Sp),
-                modifier = modifier.fillMaxWidth()
-            )
+                Text(
+                    style = MaterialTheme.typography.caption,
+                    text = news.sourceName
+                )
+                Spacer(modifier = modifier.height(12.dp))
+
+                Image(
+                    painter = rememberImagePainter(news.newsImage),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = modifier
+                        .height(300.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .fillMaxWidth()
+                )
+
+                Spacer(modifier = modifier.height(12.dp))
+
+                Text(
+                    style = MaterialTheme.typography.body2,
+                    text = news.newsContent,
+                    modifier = modifier.wrapContentSize()
+                )
+            }
         }
+    }
+
+    @Composable
+    override fun BackHandler(
+        backDispatcher: OnBackPressedDispatcher,
+        enabled: Boolean,
+        onBack: () -> Unit
+    ) {
+        // Safely update the current `onBack` lambda when a new one is provided
+        val currentOnBack by rememberUpdatedState(onBack)
+
+        // Remember in Composition a back callback that calls the `onBack` lambda
+        val backCallback = remember {
+            // Always intercept back events. See the SideEffect for
+            // a more complete version
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    currentOnBack()
+                }
+            }
+        }
+
+        // On every successful composition, update the callback with the `enabled` value
+        // to tell `backCallback` whether back events should be intercepted or not
+        SideEffect {
+            backCallback.isEnabled = enabled
+        }
+
+        // If `backDispatcher` changes, dispose and reset the effect
+        DisposableEffect(backDispatcher) {
+            // Add callback to the backDispatcher
+            backDispatcher.addCallback(backCallback)
+
+            // When the effect leaves the Composition, remove the callback
+            onDispose {
+                backCallback.remove()
+            }
+        }
+
+
     }
 
     @ExperimentalUnitApi
     @Composable
-    override fun DefaultToolbar(navigationClick: () -> Unit, modifier: Modifier) {
+    private fun DefaultToolbar(
+        navigationClick: () -> Unit,
+        content: @Composable (PaddingValues) -> Unit
+    ) {
         Scaffold(
             // below line we are
             // creating a top bar.
@@ -104,10 +184,8 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                         // inside title we are
                         // adding text to our toolbar.
                         Text(
-                            text = stringResource(id = R.string.app_name),
-                            // below line is use
-                            // to give text color.
-                            color = Color.Black
+                            style = MaterialTheme.typography.h6,
+                            text = stringResource(id = R.string.app_name)
                         )
                     },
                     navigationIcon = {
@@ -123,28 +201,27 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                         }
                     },
                     // below line is use to give background color
-                    backgroundColor = colorResource(id = R.color.purple_200),
+                    backgroundColor = colorResource(id = R.color.white),
 
                     // content color is use to give
                     // color to our content in our toolbar.
-                    contentColor = Color.White,
+                    contentColor = Color.Black,
 
                     // below line is use to give
                     // elevation to our toolbar.
                     elevation = 12.dp
                 )
-            }){
-
-        }
+            }, content = content
+        )
     }
 
     @ExperimentalUnitApi
     @Composable
-    override fun NewsDetailToolbar(
-        news: News,
+    private fun NewsDetailToolbar(
+        toolBarText: String,
         navigationClick: () -> Unit,
         actionClick: () -> Unit,
-        modifier: Modifier
+        content: @Composable (PaddingValues) -> Unit
     ) {
         // theme for our app.
         Scaffold(
@@ -158,10 +235,8 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                         // inside title we are
                         // adding text to our toolbar.
                         Text(
-                            text = news.sourceName,
-                            // below line is use
-                            // to give text color.
-                            color = Color.White
+                            style = MaterialTheme.typography.h6,
+                            text = toolBarText
                         )
                     },
                     navigationIcon = {
@@ -185,19 +260,18 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                         }
                     },
                     // below line is use to give background color
-                    backgroundColor = colorResource(id = R.color.purple_200),
+                    backgroundColor = colorResource(id = R.color.white),
 
                     // content color is use to give
                     // color to our content in our toolbar.
-                    contentColor = Color.White,
+                    contentColor = Color.Black,
 
                     // below line is use to give
                     // elevation to our toolbar.
-                    elevation = 12.dp
+                    elevation = 8.dp
                 )
-            }){
-
-        }
+            }, content = content
+        )
     }
 
     @Composable
@@ -244,11 +318,10 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                 }), contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = modifier
-                    .height(Dp(150F))
-                    .width(Dp(150F))
+                    .size(150.dp)
                     .weight(1f)
                     .padding(Dp(4f))
-                    .clip(RoundedCornerShape(Dp(8F)))
+                    .clip(RoundedCornerShape(8.dp))
 
             )
         }

@@ -1,5 +1,6 @@
 package com.junemon.compose_stable.screen
 
+import androidx.activity.OnBackPressedDispatcher
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.ExperimentalUnitApi
@@ -13,6 +14,11 @@ import com.junemon.compose_stable.core.domain.usecase.NewsUseCase
 import com.junemon.compose_stable.core.presentation.common.LoadingUseCase
 import com.junemon.compose_stable.core.presentation.screens.ScreensUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -26,6 +32,17 @@ class NewsViewModel @Inject constructor(
     private val screensUseCase: ScreensUseCase,
     private val loadingUseCase: LoadingUseCase
 ) : ViewModel() {
+
+    private var _newsDetailState: Channel<String> = Channel(Channel.CONFLATED)
+
+    val newsDetailFlow: Flow<String?> =
+        _newsDetailState.receiveAsFlow().distinctUntilChanged()
+
+    fun setNewsDetail(data: String) {
+        viewModelScope.launch {
+            _newsDetailState.send(data)
+        }
+    }
 
     fun getNews(): LiveData<DomainResult<List<News>>> =
         domainUseCase.getNews().asLiveData(viewModelScope.coroutineContext)
@@ -41,9 +58,14 @@ class NewsViewModel @Inject constructor(
 
     @ExperimentalUnitApi
     @Composable
-    fun NewsDetail(news: News, modifier: Modifier) =
+    fun NewsDetail(
+        news: News, navigationClick: () -> Unit,
+        actionClick: () -> Unit, modifier: Modifier
+    ) =
         screensUseCase.NewsDetail(
             news = news,
+            navigationClick = navigationClick,
+            actionClick = actionClick,
             modifier = modifier
         )
 
@@ -58,4 +80,10 @@ class NewsViewModel @Inject constructor(
         itemSize = itemSize,
         modifier = modifier
     )
+
+    @Composable
+    fun BackHandler(
+        backDispatcher: OnBackPressedDispatcher,
+        onBack: () -> Unit
+    ) = screensUseCase.BackHandler(backDispatcher = backDispatcher,enabled = true, onBack = onBack)
 }
