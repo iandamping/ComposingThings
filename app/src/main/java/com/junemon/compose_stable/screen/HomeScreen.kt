@@ -5,8 +5,6 @@ import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.ExperimentalUnitApi
@@ -30,11 +28,10 @@ fun ComposeHomeScreen(
     navController: NavHostController,
     modifier: Modifier
 ) {
-    val result: DomainResult<List<News>> by viewModel.getNews()
-        .observeAsState(initial = DomainResult.Loading)
-    when (result) {
+
+    when (val result: DomainResult<List<News>> = viewModel.getNews().value) {
         is DomainResult.Data -> viewModel.ListNews(
-            news = (result as DomainResult.Data<List<News>>).data,
+            news = result.data,
             modifier = modifier,
             newsSelect = {
                 viewModel.setNewsDetail(Gson().toJson(it))
@@ -44,7 +41,7 @@ fun ComposeHomeScreen(
 
         is DomainResult.Error -> Toast.makeText(
             LocalContext.current,
-            (result as DomainResult.Error).message,
+            result.message,
             Toast.LENGTH_SHORT
         ).show()
 

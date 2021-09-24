@@ -2,6 +2,7 @@ package com.junemon.compose_stable.screen
 
 import androidx.activity.OnBackPressedDispatcher
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.lifecycle.LiveData
@@ -44,8 +45,8 @@ class NewsViewModel @Inject constructor(
         }
     }
 
-    fun getNews(): LiveData<DomainResult<List<News>>> =
-        domainUseCase.getNews().asLiveData(viewModelScope.coroutineContext)
+    @Composable
+    fun getNews(): State<DomainResult<List<News>>> = domainUseCase.getNews()
 
     @ExperimentalUnitApi
     @Composable

@@ -1,9 +1,11 @@
 package com.junemon.compose_stable.core.domain.usecase
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import com.junemon.compose_stable.core.domain.model.DomainResult
 import com.junemon.compose_stable.core.domain.model.response.News
 import com.junemon.compose_stable.core.domain.repository.NewsRepository
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 /**
@@ -13,7 +15,8 @@ import javax.inject.Inject
  */
 class NewsUseCaseImpl @Inject constructor(private val repository: NewsRepository) : NewsUseCase {
 
-    override fun getNews(): Flow<DomainResult<List<News>>> {
-        return repository.getNews()
+    @Composable
+    override fun getNews(): State<DomainResult<List<News>>> {
+        return repository.getNews().collectAsState(initial = DomainResult.Loading)
     }
 }
