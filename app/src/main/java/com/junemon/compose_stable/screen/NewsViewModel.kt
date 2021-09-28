@@ -1,19 +1,21 @@
 package com.junemon.compose_stable.screen
 
 import androidx.activity.OnBackPressedDispatcher
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.ExperimentalUnitApi
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.junemon.compose_stable.core.domain.model.DomainResult
 import com.junemon.compose_stable.core.domain.model.response.News
 import com.junemon.compose_stable.core.domain.usecase.NewsUseCase
-import com.junemon.compose_stable.core.presentation.common.LoadingUseCase
 import com.junemon.compose_stable.core.presentation.screens.ScreensUseCase
+import com.junemon.compose_stable.navigation.ScreensNavigation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -30,9 +32,14 @@ import javax.inject.Inject
 @HiltViewModel
 class NewsViewModel @Inject constructor(
     private val domainUseCase: NewsUseCase,
-    private val screensUseCase: ScreensUseCase,
-    private val loadingUseCase: LoadingUseCase
+    private val screensUseCase: ScreensUseCase
 ) : ViewModel() {
+
+    val searchState: MutableState<String> = mutableStateOf("")
+
+    fun setSearchState(data: String) {
+        searchState.value = data
+    }
 
     private var _newsDetailState: Channel<String> = Channel(Channel.CONFLATED)
 
@@ -44,6 +51,21 @@ class NewsViewModel @Inject constructor(
             _newsDetailState.send(data)
         }
     }
+
+    @Composable
+    fun NewsToolbar(
+        screen: ScreensNavigation,
+        toolBarText: String = "",
+        navigationClick: () -> Unit = {},
+        actionClick: () -> Unit,
+        content: @Composable (PaddingValues) -> Unit
+    ) = screensUseCase.DefaultToolbar(
+        screen = screen,
+        toolBarText = toolBarText,
+        navigationClick = navigationClick,
+        actionClick = actionClick,
+        content = content
+    )
 
     @Composable
     fun getNews(): State<DomainResult<List<News>>> = domainUseCase.getNews()
@@ -70,14 +92,21 @@ class NewsViewModel @Inject constructor(
             modifier = modifier
         )
 
-    @Composable
-    fun LottieCirclingLoading() = loadingUseCase.LottieCirclingLoading()
 
     @Composable
-    fun LottieFluidLoading() = loadingUseCase.LottieFluidLoading()
+    fun FailedScreen(text: String, modifier: Modifier) =
+        screensUseCase.FailedScreen(text = text, modifier = modifier)
 
     @Composable
-    fun Shimmer(itemSize: Int, modifier: Modifier) = loadingUseCase.Shimmer(
+    fun LottieCirclingLoading(size: Dp, modifier: Modifier) =
+        screensUseCase.LottieCirclingLoading(size, modifier)
+
+    @Composable
+    fun LottieFluidLoading(size: Dp, modifier: Modifier) =
+        screensUseCase.LottieFluidLoading(size, modifier)
+
+    @Composable
+    fun Shimmer(itemSize: Int, modifier: Modifier) = screensUseCase.Shimmer(
         itemSize = itemSize,
         modifier = modifier
     )
@@ -86,5 +115,5 @@ class NewsViewModel @Inject constructor(
     fun BackHandler(
         backDispatcher: OnBackPressedDispatcher,
         onBack: () -> Unit
-    ) = screensUseCase.BackHandler(backDispatcher = backDispatcher,enabled = true, onBack = onBack)
+    ) = screensUseCase.BackHandler(backDispatcher = backDispatcher, enabled = true, onBack = onBack)
 }

@@ -1,7 +1,5 @@
 package com.junemon.compose_stable.module
 
-import com.junemon.compose_stable.core.presentation.common.LoadingUseCase
-import com.junemon.compose_stable.core.presentation.common.LoadingUseCaseImpl
 import com.junemon.compose_stable.core.presentation.screens.ScreensUseCase
 import com.junemon.compose_stable.core.presentation.screens.ScreensUseCaseImpl
 import dagger.Binds
@@ -23,7 +21,4 @@ interface PresentationModule {
     @Singleton
     fun bindsScreenUseCase(useCase: ScreensUseCaseImpl): ScreensUseCase
 
-    @Binds
-    @Singleton
-    fun bindsLoadingUseCase(useCase: LoadingUseCaseImpl): LoadingUseCase
 }
