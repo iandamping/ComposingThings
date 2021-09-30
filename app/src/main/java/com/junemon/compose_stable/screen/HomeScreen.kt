@@ -6,11 +6,17 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavHostController
 import com.google.gson.Gson
 import com.junemon.compose_stable.core.domain.model.DomainResult
@@ -30,6 +36,7 @@ fun ComposeHomeScreen(
     navController: NavHostController,
     modifier: Modifier
 ) {
+
     viewModel.NewsToolbar(screen = ScreensNavigation.LoadHome(),actionClick = {
        navController.navigate(ScreensNavigation.LoadSearch().name)
     }) {

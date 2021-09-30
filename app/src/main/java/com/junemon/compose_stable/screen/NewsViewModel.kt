@@ -40,10 +40,10 @@ class NewsViewModel @Inject constructor(
         _searchState.value = data
     }
 
-    @Composable
+
     fun getSearchState() = searchState.search { query ->
         domainUseCase.searchNews(query)
-    }.collectAsState(initial = DomainResult.Idle)
+    }
 
     private var _newsDetailState: Channel<String> = Channel(Channel.CONFLATED)
 

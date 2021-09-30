@@ -1,8 +1,9 @@
 package com.junemon.compose_stable.core.domain.usecase
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import com.junemon.compose_stable.core.domain.model.DomainResult
 import com.junemon.compose_stable.core.domain.model.response.News
 import com.junemon.compose_stable.core.domain.repository.NewsRepository
@@ -18,7 +19,11 @@ class NewsUseCaseImpl @Inject constructor(private val repository: NewsRepository
 
     @Composable
     override fun getNews(): State<DomainResult<List<News>>> {
-        return repository.getNews().collectAsState(initial = DomainResult.Loading)
+        val lifecycleOwner = LocalLifecycleOwner.current
+        val homeNewsFlowLifecycleAware = remember(repository.getNews(), lifecycleOwner) {
+            repository.getNews().flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+        }
+        return homeNewsFlowLifecycleAware.collectAsState(initial = DomainResult.Loading)
     }
 
     override fun searchNews(query: String): Flow<DomainResult<List<News>>> {
