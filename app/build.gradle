@@ -68,7 +68,7 @@ dependencies {
     //lottie
     debugImplementation "com.airbnb.android:lottie-compose:4.1.0"
     //navigation
-    implementation "androidx.navigation:navigation-compose:2.4.0-alpha08"
+    implementation "androidx.navigation:navigation-compose:2.4.0-alpha09"
     //hilt
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"

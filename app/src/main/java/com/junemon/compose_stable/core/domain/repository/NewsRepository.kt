@@ -1,5 +1,7 @@
 package com.junemon.compose_stable.core.domain.repository
 
+import com.junemon.compose_stable.core.data.model.DataSourceResult
+import com.junemon.compose_stable.core.data.model.response.NewsResponse
 import com.junemon.compose_stable.core.domain.model.DomainResult
 import com.junemon.compose_stable.core.domain.model.response.News
 import kotlinx.coroutines.flow.Flow
@@ -12,4 +14,6 @@ import kotlinx.coroutines.flow.Flow
 interface NewsRepository {
 
     fun getNews(): Flow<DomainResult<List<News>>>
+
+    fun searchNews(query:String): Flow<DomainResult<List<News>>>
 }

@@ -3,9 +3,8 @@ package com.junemon.compose_stable.screen
 import androidx.activity.OnBackPressedDispatcher
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.ExperimentalUnitApi
@@ -16,11 +15,10 @@ import com.junemon.compose_stable.core.domain.model.response.News
 import com.junemon.compose_stable.core.domain.usecase.NewsUseCase
 import com.junemon.compose_stable.core.presentation.screens.ScreensUseCase
 import com.junemon.compose_stable.navigation.ScreensNavigation
+import com.junemon.compose_stable.util.search
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,11 +33,17 @@ class NewsViewModel @Inject constructor(
     private val screensUseCase: ScreensUseCase
 ) : ViewModel() {
 
-    val searchState: MutableState<String> = mutableStateOf("")
+    private val _searchState: MutableStateFlow<String> = MutableStateFlow("")
+    val searchState: StateFlow<String> = _searchState.asStateFlow()
 
     fun setSearchState(data: String) {
-        searchState.value = data
+        _searchState.value = data
     }
+
+    @Composable
+    fun getSearchState() = searchState.search { query ->
+        domainUseCase.searchNews(query)
+    }.collectAsState(initial = DomainResult.Idle)
 
     private var _newsDetailState: Channel<String> = Channel(Channel.CONFLATED)
 

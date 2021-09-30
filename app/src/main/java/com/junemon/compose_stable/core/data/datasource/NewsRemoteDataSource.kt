@@ -12,4 +12,6 @@ interface NewsRemoteDataSource {
 
     suspend fun getNews(): DataSourceResult<List<NewsResponse>>
 
+    suspend fun searchNews(query:String): DataSourceResult<List<NewsResponse>>
+
 }

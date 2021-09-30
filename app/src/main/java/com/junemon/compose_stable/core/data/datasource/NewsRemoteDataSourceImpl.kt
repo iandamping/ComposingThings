@@ -32,4 +32,18 @@ class NewsRemoteDataSourceImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun searchNews(query: String): DataSourceResult<List<NewsResponse>> {
+        return when (val response = oneShotCalls { api.searchNews(apiKey = API_KEY,searchQuery = query) }) {
+            is Results.Error -> DataSourceResult.SourceError(response.exception)
+            is Results.Success -> when (response.data.status) {
+                "ok" -> {
+                    DataSourceResult.SourceValue(
+                        response.data.articles
+                    )
+                }
+                else -> DataSourceResult.SourceError(Exception(NETWORK_ERROR))
+            }
+        }
+    }
 }

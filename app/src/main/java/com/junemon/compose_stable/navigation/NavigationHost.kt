@@ -4,19 +4,10 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.ExperimentalUnitApi
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navArgument
-import com.google.gson.Gson
-import com.junemon.compose_stable.core.domain.model.response.News
-import com.junemon.compose_stable.screen.ComposeDetailNewsScreen
-import com.junemon.compose_stable.screen.ComposeHomeScreen
-import com.junemon.compose_stable.screen.ComposeSplashScreen
-import com.junemon.compose_stable.screen.NewsViewModel
-import timber.log.Timber
+import com.junemon.compose_stable.screen.*
 
 /**
  * Created by Ian Damping on 05,September,2021
@@ -47,6 +38,13 @@ fun NavigationHost(
                 modifier = modifier
             )
         }
+        composable(ScreensNavigation.LoadSearch().name) {
+            ComposeSearchScreen(
+                viewModel = viewModel,
+                navController = navController,
+                modifier = modifier
+            )
+        }
 
         composable(ScreensNavigation.LoadDetail().name) {
             ComposeDetailNewsScreen(
@@ -55,23 +53,6 @@ fun NavigationHost(
                 modifier = modifier
             )
         }
-
-        // composable(route ="${ScreensNavigation.LoadDetail().name}/{newsDetail}", arguments =
-        // listOf(
-        //     navArgument("newsDetail") {
-        //         type = NavType.StringType
-        //     }
-        // )) { navBackStackEntry ->
-        //     val newsDetailToolbarText = navBackStackEntry.arguments?.getString("newsDetail")
-        //     if (!newsDetailToolbarText.isNullOrEmpty()){
-        //         ComposeDetailNewsScreen(
-        //             viewModel = viewModel,
-        //             toolbarText = newsDetailToolbarText,
-        //             navController = navController,
-        //             modifier = modifier
-        //         )
-        //     }
-        // }
     }
 }
 

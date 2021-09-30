@@ -24,7 +24,6 @@ import timber.log.Timber
  * Indonesia.
  */
 @ExperimentalUnitApi
-@ExperimentalAnimationApi
 @Composable
 fun ComposeHomeScreen(
     viewModel: NewsViewModel,
@@ -32,7 +31,7 @@ fun ComposeHomeScreen(
     modifier: Modifier
 ) {
     viewModel.NewsToolbar(screen = ScreensNavigation.LoadHome(),actionClick = {
-        Timber.e("clicked at Home")
+       navController.navigate(ScreensNavigation.LoadSearch().name)
     }) {
         when (val result: DomainResult<List<News>> = viewModel.getNews().value) {
             is DomainResult.Data -> viewModel.ListNews(
@@ -41,7 +40,6 @@ fun ComposeHomeScreen(
                 newsSelect = {
                     viewModel.setNewsDetail(Gson().toJson(it))
                     navController.navigate(ScreensNavigation.LoadDetail().name)
-                    // navigateToDetailNews(navController = navController, newsDetail = it.sourceName)
                 })
 
             is DomainResult.Error -> viewModel.FailedScreen(text = result.message, modifier = modifier)
@@ -66,6 +64,4 @@ fun ComposeHomeScreen(
     }
 }
 
-private fun navigateToDetailNews(navController: NavHostController, newsDetail: String) {
-    navController.navigate("${ScreensNavigation.LoadDetail().name}/${newsDetail}")
-}
+

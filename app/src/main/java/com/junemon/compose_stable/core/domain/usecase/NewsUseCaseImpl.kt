@@ -6,6 +6,7 @@ import androidx.compose.runtime.collectAsState
 import com.junemon.compose_stable.core.domain.model.DomainResult
 import com.junemon.compose_stable.core.domain.model.response.News
 import com.junemon.compose_stable.core.domain.repository.NewsRepository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 /**
@@ -18,5 +19,9 @@ class NewsUseCaseImpl @Inject constructor(private val repository: NewsRepository
     @Composable
     override fun getNews(): State<DomainResult<List<News>>> {
         return repository.getNews().collectAsState(initial = DomainResult.Loading)
+    }
+
+    override fun searchNews(query: String): Flow<DomainResult<List<News>>> {
+        return repository.searchNews(query = query)
     }
 }

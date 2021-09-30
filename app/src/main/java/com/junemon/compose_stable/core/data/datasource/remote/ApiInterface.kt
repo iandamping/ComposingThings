@@ -16,6 +16,13 @@ interface ApiInterface {
 
     @GET(GET_TOP_HEADLINES)
     suspend fun getNews(
-        @Query("apiKey") apiKey: String, @Query("country") country:String = "id"
+        @Query("apiKey") apiKey: String, @Query("country") country: String = "id"
+    ): Response<BaseResponse<NewsResponse>>
+
+    @GET(GET_TOP_HEADLINES)
+    suspend fun searchNews(
+        @Query("apiKey") apiKey: String,
+        @Query("country") country: String = "id",
+        @Query("q") searchQuery: String
     ): Response<BaseResponse<NewsResponse>>
 }

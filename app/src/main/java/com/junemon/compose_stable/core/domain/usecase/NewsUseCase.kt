@@ -15,4 +15,6 @@ interface NewsUseCase {
 
     @Composable
     fun getNews(): State<DomainResult<List<News>>>
+
+    fun searchNews(query:String): Flow<DomainResult<List<News>>>
 }

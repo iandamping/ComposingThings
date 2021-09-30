@@ -1,8 +1,6 @@
 package com.junemon.compose_stable.core.presentation.screens
 
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.TextField
@@ -34,54 +32,65 @@ import com.junemon.compose_stable.ui.theme.ComposingThingsTheme
 @ExperimentalUnitApi
 @Composable
 fun DefaultPreview() {
-    var name = rememberSaveable { mutableStateOf("") }
-
-    ComposingThingsTheme {
-        SearchView(value = name.value, onValueChange = { name.value = it })
-    }
+//    var name = rememberSaveable { mutableStateOf("") }
+//
+//    ComposingThingsTheme {
+//        SearchView(value = name.value, onValueChange = { name.value = it })
+//    }
 }
 
 
 @Composable
-fun SearchView(value: String, onValueChange: (String) -> Unit) {
-    TextField(
+fun SearchView(value: String, onValueChange: (String) -> Unit,
+               content: @Composable () -> Unit) {
+    Column(
+        Modifier
+            .fillMaxSize()
+    ) {
+        TextField(
             value = value,
             modifier = Modifier
-                    .fillMaxWidth(),
+                .fillMaxWidth(),
             onValueChange = {
                 onValueChange.invoke(it)
             },
             leadingIcon = {
-                Icon(Icons.Default.Search, contentDescription = null,
-                        modifier = Modifier
-                                .size(40.dp)
-                                .padding(8.dp))
+                Icon(
+                    Icons.Default.Search, contentDescription = null,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(8.dp)
+                )
             },
             trailingIcon = {
                 if (value != TextFieldValue("").text) {
                     IconButton(onClick = {
                         onValueChange.invoke("")
                     }) {
-                        Icon(Icons.Default.Close, contentDescription = null,
-                                modifier = Modifier
-                                        .size(40.dp)
-                                        .padding(8.dp))
+                        Icon(
+                            Icons.Default.Close, contentDescription = null,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .padding(8.dp)
+                        )
                     }
                 }
             },
             colors = TextFieldDefaults.textFieldColors(
-                    textColor = Color.White,
-                    cursorColor = Color.White,
-                    leadingIconColor = Color.White,
-                    trailingIconColor = Color.White,
-                    backgroundColor = colorResource(id = R.color.purple_500),
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent
+                textColor = Color.White,
+                cursorColor = Color.White,
+                leadingIconColor = Color.White,
+                trailingIconColor = Color.White,
+                backgroundColor = colorResource(id = R.color.purple_500),
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
             ),
             singleLine = true,
             shape = RectangleShape
-    )
+        )
+        content.invoke()
+    }
 }
 
 
