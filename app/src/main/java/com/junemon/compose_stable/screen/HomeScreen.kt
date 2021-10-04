@@ -37,10 +37,16 @@ fun ComposeHomeScreen(
     modifier: Modifier
 ) {
 
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val homeNewsFlowLifecycleAware = remember(viewModel.getNews(), lifecycleOwner) {
+        viewModel.getNews().flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+    }
+    val homeNews by homeNewsFlowLifecycleAware.collectAsState(initial = DomainResult.Loading)
+
     viewModel.NewsToolbar(screen = ScreensNavigation.LoadHome(),actionClick = {
        navController.navigate(ScreensNavigation.LoadSearch().name)
     }) {
-        when (val result: DomainResult<List<News>> = viewModel.getNews().value) {
+        when (val result: DomainResult<List<News>> = homeNews) {
             is DomainResult.Data -> viewModel.ListNews(
                 news = result.data,
                 modifier = modifier,

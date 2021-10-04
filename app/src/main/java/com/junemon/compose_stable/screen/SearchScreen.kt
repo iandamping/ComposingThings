@@ -14,6 +14,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavHostController
 import com.google.gson.Gson
 import com.junemon.compose_stable.core.domain.model.DomainResult
+import com.junemon.compose_stable.core.domain.model.response.News
 import com.junemon.compose_stable.core.presentation.screens.SearchView
 import com.junemon.compose_stable.navigation.ScreensNavigation
 import timber.log.Timber
@@ -37,18 +38,18 @@ fun ComposeSearchScreen(
         viewModel.getSearchState().flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
     }
 
-    val searchResults by searchFlowLifecycleAware.collectAsState(initial = DomainResult.Loading)
+    val searchResults by searchFlowLifecycleAware.collectAsState(initial = DomainResult.Idle)
 
     SearchView(value = viewModel.searchState.collectAsState().value, onValueChange = { query ->
         viewModel.setSearchState(query)
     }) {
-        when (val result = searchResults) {
+        when (searchResults) {
             is DomainResult.Data -> {
-                if (result.data.isEmpty()){
+                if ((searchResults as DomainResult.Data<List<News>>).data.isEmpty()){
                     viewModel.FailedScreen(text = "News not find", modifier = modifier)
                 }else {
                     viewModel.ListNews(
-                        news = result.data,
+                        news = (searchResults as DomainResult.Data<List<News>>).data,
                         modifier = modifier,
                         newsSelect = {
                             viewModel.setNewsDetail(Gson().toJson(it))
@@ -58,7 +59,7 @@ fun ComposeSearchScreen(
 
             }
             is DomainResult.Error -> {
-                viewModel.FailedScreen(text = result.message, modifier = modifier)
+                viewModel.FailedScreen(text = (searchResults as DomainResult.Error).message, modifier = modifier)
             }
             is DomainResult.Loading -> {
                 viewModel.LottieCirclingLoading(200.dp, modifier)

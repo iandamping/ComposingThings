@@ -71,8 +71,7 @@ class NewsViewModel @Inject constructor(
         content = content
     )
 
-    @Composable
-    fun getNews(): State<DomainResult<List<News>>> = domainUseCase.getNews()
+    fun getNews(): Flow<DomainResult<List<News>>> = domainUseCase.getNews()
 
     @ExperimentalUnitApi
     @Composable
