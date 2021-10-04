@@ -2,16 +2,15 @@ package com.junemon.compose_stable.feature
 
 import androidx.activity.OnBackPressedDispatcher
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.ViewModel
-import coil.annotation.ExperimentalCoilApi
 import com.junemon.compose_stable.core.domain.model.UiState
 import com.junemon.compose_stable.core.domain.response.PokemonDetail
 import com.junemon.compose_stable.core.domain.usecase.PokemonUseCase
 import com.junemon.compose_stable.core.presentation.screens.ScreensUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 
@@ -26,8 +25,8 @@ class PokemonViewModel @Inject constructor(
     private val screenUseCase: ScreensUseCase
 ) : ViewModel() {
 
-    @Composable
-    fun getPokemon(): State<UiState<List<PokemonDetail>>> = dataUseCase.getPokemon()
+
+    fun getPokemon(): Flow<UiState<List<PokemonDetail>>> = dataUseCase.getPokemon()
 
     @Composable
     fun ListPokemon(

@@ -2,9 +2,15 @@ package com.junemon.compose_stable.screen
 
 import android.widget.Toast
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavHostController
 import coil.annotation.ExperimentalCoilApi
 import com.junemon.compose_stable.core.domain.model.UiState
@@ -24,9 +30,16 @@ fun HomeScreen(
 //    navControler: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    when (val result: UiState<List<PokemonDetail>> = pokemonVm.getPokemon().value) {
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val pokemonFlowLifecycleAware = remember(pokemonVm.getPokemon(), lifecycleOwner) {
+        pokemonVm.getPokemon().flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+    }
+    val pokemonResult by pokemonFlowLifecycleAware.collectAsState(initial = UiState.Loading)
+
+    when (pokemonResult) {
         is UiState.Content -> pokemonVm.ListPokemon(
-            listOfPokemon = result.data,
+            listOfPokemon = (pokemonResult as UiState.Content<List<PokemonDetail>>).data,
             modifier = modifier,
             selectPokemon = { selectedPokemon ->
                 Timber.e("select pokemon : ${selectedPokemon.pokemonImage}")
@@ -37,7 +50,7 @@ fun HomeScreen(
 
         is UiState.Error -> Toast.makeText(
             LocalContext.current,
-            result.message,
+            (pokemonResult as UiState.Error).message,
             Toast.LENGTH_SHORT
         ).show()
 
