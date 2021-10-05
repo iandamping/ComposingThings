@@ -2,6 +2,10 @@ package com.junemon.compose_stable.core.presentation.screens
 
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,6 +20,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
@@ -130,46 +137,93 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
         pokemonSelect: (PokemonDetail) -> Unit,
         modifier: Modifier
     ) {
+        var isExpanded by remember {
+            mutableStateOf(false)
+        }
+        val transition = updateTransition(targetState = isExpanded, label = "")
+        val pokemonImageSizeDp by transition.animateDp(targetValueByState = {
+            if (it) 300.dp else 600.dp
+        }, label = "")
+
         val listState = rememberScrollState()
+
         Card(
             elevation = Dp(4F),
             shape = RoundedCornerShape(8.dp),
             modifier = modifier
+                .fillMaxSize()
                 .padding(8.dp)
                 .clickable {
                     pokemonSelect(singlePokemon)
                 }
         ) {
-            Column(
-                modifier
-                    .clickable {
-                        pokemonSelect(singlePokemon)
+            if (isExpanded) {
+                Column(
+                    modifier
+                        .animateContentSize()
+                        .padding(Dp(8f))
+                        .verticalScroll(listState)
+                        .clickable {
+                            isExpanded = false
+//                            pokemonSelect(singlePokemon)
+                        }
+                ) {
+                    Text(
+                        modifier = modifier
+                            .padding(8.dp)
+                            .animateContentSize(),
+                        text = singlePokemon.pokemonName,
+                        style = MaterialTheme.typography.h5
+                    )
+
+                    Image(
+                        painter = rememberImagePainter(singlePokemon.pokemonImage, builder = {
+                            crossfade(true)
+                        }),
+                        modifier = modifier
+                            .size(pokemonImageSizeDp)
+                            .padding(8.dp),
+                        contentDescription = null
+                    )
+
+                    ListOfPokemonSprite(
+                        pokemonItem = singlePokemon,
+                        modifier = modifier.fillMaxWidth()
+                    )
+
+                    Column(modifier = modifier.fillMaxWidth()) {
+                        PokemonDetailStat(pokemonItem = singlePokemon, modifier = modifier)
+                        PokemonDetailType(pokemonItem = singlePokemon, modifier = modifier)
                     }
-                    .padding(Dp(8f))
-                    .verticalScroll(listState)
-            ) {
-
-                Text(text = singlePokemon.pokemonName, style = MaterialTheme.typography.h5)
-
-                Image(
-                    painter = rememberImagePainter(singlePokemon.pokemonImage, builder = {
-                        crossfade(true)
-                    }),
-                    modifier = modifier
-                        .size(300.dp)
-                        .padding(8.dp),
-                    contentDescription = null
-                )
-
-                ListOfPokemonSprite(pokemonItem = singlePokemon, modifier = modifier.fillMaxWidth())
-
-                Column(modifier = modifier.fillMaxWidth()) {
-                    PokemonDetailStat(pokemonItem = singlePokemon, modifier = modifier)
-                    PokemonDetailType(pokemonItem = singlePokemon, modifier = modifier)
                 }
 
+            } else {
+                Column(
+                    modifier
+                        .padding(Dp(8f))
+                        .clickable {
+                            isExpanded = true
+//                            pokemonSelect(singlePokemon)
+                        },
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    val matrix = ColorMatrix()
+                    matrix.setToSaturation(0F)
 
+                    Image(
+                        painter = rememberImagePainter(singlePokemon.pokemonImage, builder = {
+                            crossfade(true)
+                        }),
+                        modifier = modifier
+                            .size(pokemonImageSizeDp)
+                            .padding(8.dp),
+                        colorFilter = ColorFilter.tint(Color.Gray),
+                        contentDescription = null
+                    )
+                }
             }
+
 
         }
     }
@@ -229,69 +283,89 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
 
     @Composable
     private fun PokemonDetailStat(pokemonItem: PokemonDetail, modifier: Modifier) {
-            Row {
-                Text(
-                    text = pokemonItem.pokemonStat0.name,
-                    modifier = modifier.weight(1f).wrapContentWidth(Alignment.Start)
-                )
-                Text(
-                    text = pokemonItem.pokemonStat0.point.toString(),
-                    modifier = modifier.weight(1f)
-                        .wrapContentWidth(Alignment.End)
-                )
-            }
-            Row {
-                Text(
-                    text = pokemonItem.pokemonStat1.name,
-                    modifier = modifier.weight(1f).wrapContentWidth(Alignment.Start)
-                )
-                Text(
-                    text = pokemonItem.pokemonStat1.point.toString(),
-                    modifier = modifier.weight(1f)
-                        .wrapContentWidth(Alignment.End)
-                )
-            }
-            Row {
-                Text(
-                    text = pokemonItem.pokemonStat2.name,
-                    modifier = modifier.weight(1f).wrapContentWidth(Alignment.Start)
-                )
-                Text(
-                    text = pokemonItem.pokemonStat2.point.toString(),
-                    modifier = modifier.weight(1f)
-                        .wrapContentWidth(Alignment.End)
-                )
-            }
-            Row {
-                Text(
-                    text = pokemonItem.pokemonStat3.name,
-                    modifier = modifier.weight(1f).wrapContentWidth(Alignment.Start)
-                )
-                Text(
-                    text = pokemonItem.pokemonStat3.point.toString(),
-                    modifier = modifier.weight(1f)
-                        .wrapContentWidth(Alignment.End)
-                )
-            }
+        Row {
+            Text(
+                text = pokemonItem.pokemonStat0.name,
+                modifier = modifier
+                    .weight(1f)
+                    .wrapContentWidth(Alignment.Start)
+            )
+            Text(
+                text = pokemonItem.pokemonStat0.point.toString(),
+                modifier = modifier
+                    .weight(1f)
+                    .wrapContentWidth(Alignment.End)
+            )
+        }
+        Row {
+            Text(
+                text = pokemonItem.pokemonStat1.name,
+                modifier = modifier
+                    .weight(1f)
+                    .wrapContentWidth(Alignment.Start)
+            )
+            Text(
+                text = pokemonItem.pokemonStat1.point.toString(),
+                modifier = modifier
+                    .weight(1f)
+                    .wrapContentWidth(Alignment.End)
+            )
+        }
+        Row {
+            Text(
+                text = pokemonItem.pokemonStat2.name,
+                modifier = modifier
+                    .weight(1f)
+                    .wrapContentWidth(Alignment.Start)
+            )
+            Text(
+                text = pokemonItem.pokemonStat2.point.toString(),
+                modifier = modifier
+                    .weight(1f)
+                    .wrapContentWidth(Alignment.End)
+            )
+        }
+        Row {
+            Text(
+                text = pokemonItem.pokemonStat3.name,
+                modifier = modifier
+                    .weight(1f)
+                    .wrapContentWidth(Alignment.Start)
+            )
+            Text(
+                text = pokemonItem.pokemonStat3.point.toString(),
+                modifier = modifier
+                    .weight(1f)
+                    .wrapContentWidth(Alignment.End)
+            )
+        }
         Row {
             Text(
                 text = pokemonItem.pokemonStat4.name,
-                modifier = modifier.weight(1f).wrapContentWidth(Alignment.Start)
+                modifier = modifier
+                    .weight(1f)
+                    .wrapContentWidth(Alignment.Start)
             )
             Text(
                 text = pokemonItem.pokemonStat4.point.toString(),
-                modifier = modifier.weight(1f).wrapContentWidth(Alignment.End)
+                modifier = modifier
+                    .weight(1f)
+                    .wrapContentWidth(Alignment.End)
             )
         }
 
         Row {
             Text(
                 text = pokemonItem.pokemonStat5.name,
-                modifier = modifier.weight(1f).wrapContentWidth(Alignment.Start)
+                modifier = modifier
+                    .weight(1f)
+                    .wrapContentWidth(Alignment.Start)
             )
             Text(
                 text = pokemonItem.pokemonStat5.point.toString(),
-                modifier = modifier.weight(1f).wrapContentWidth(Alignment.End)
+                modifier = modifier
+                    .weight(1f)
+                    .wrapContentWidth(Alignment.End)
             )
         }
 
@@ -300,56 +374,66 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
 
     @Composable
     private fun PokemonDetailType(pokemonItem: PokemonDetail, modifier: Modifier) {
+        Row {
+            Text(
+                text = "Type :",
+                modifier = modifier
+                    .weight(1f)
+                    .wrapContentWidth(Alignment.Start)
+            )
+            Text(
+                text = pokemonItem.pokemonType0, modifier = modifier
+                    .weight(1f)
+                    .wrapContentWidth(Alignment.End)
+            )
+        }
+        if (pokemonItem.pokemonType1 != ONE_TYPE_MONS) {
             Row {
                 Text(
-                    text = "Type :",
-                    modifier = modifier.weight(1f).wrapContentWidth(Alignment.Start)
+                    text = "",
+                    modifier = modifier
+                        .weight(1f)
+                        .wrapContentWidth(Alignment.Start)
                 )
                 Text(
-                    text = pokemonItem.pokemonType0, modifier = modifier
+                    text = pokemonItem.pokemonType1,
+                    modifier = modifier
                         .weight(1f)
                         .wrapContentWidth(Alignment.End)
                 )
             }
-            if (pokemonItem.pokemonType1 != ONE_TYPE_MONS) {
-                Row {
-                    Text(
-                        text = "",
-                        modifier = modifier.weight(1f).wrapContentWidth(Alignment.Start)
-                    )
-                    Text(
-                        text = pokemonItem.pokemonType1,
-                        modifier = modifier
-                            .weight(1f)
-                            .wrapContentWidth(Alignment.End)
-                    )
-                }
-            }
+        }
 
+        Row {
+            Text(
+                text = "Ability :",
+                modifier = modifier
+                    .weight(1f)
+                    .wrapContentWidth(Alignment.Start)
+            )
+            Text(
+                text = pokemonItem.pokemonAbility1,
+                modifier = modifier
+                    .weight(1f)
+                    .wrapContentWidth(Alignment.End)
+            )
+        }
+        if (pokemonItem.pokemonAbility2 != ONE_SKILL_MONS) {
             Row {
                 Text(
-                    text = "Ability :",
-                    modifier = modifier.weight(1f).wrapContentWidth(Alignment.Start)
+                    text = "",
+                    modifier = modifier
+                        .weight(1f)
+                        .wrapContentWidth(Alignment.Start)
                 )
                 Text(
-                    text = pokemonItem.pokemonAbility1,
-                    modifier = modifier.weight(1f)
+                    text = pokemonItem.pokemonAbility2,
+                    modifier = modifier
+                        .weight(1f)
                         .wrapContentWidth(Alignment.End)
                 )
             }
-            if (pokemonItem.pokemonAbility2 != ONE_SKILL_MONS) {
-                Row {
-                    Text(
-                        text = "",
-                        modifier = modifier.weight(1f).wrapContentWidth(Alignment.Start)
-                    )
-                    Text(
-                        text = pokemonItem.pokemonAbility2,
-                        modifier = modifier.weight(1f)
-                            .wrapContentWidth(Alignment.End)
-                    )
-                }
-            }
+        }
 
     }
 }
