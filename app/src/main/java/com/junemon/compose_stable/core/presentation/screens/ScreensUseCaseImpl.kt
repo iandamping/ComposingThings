@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
@@ -51,7 +52,7 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
             content = { listState -> //this param is provided by the method itself, add this param below.
                 LazyRow(
                     state = listState,
-                    modifier = modifier.fillMaxSize(),
+                    modifier = modifier,
                     horizontalArrangement = Arrangement.spacedBy(Dp(8f))
                 ) {
                     items(listOfPokemon) { singlePokemonItem ->
@@ -170,10 +171,12 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                 ) {
                     Text(
                         modifier = modifier
+                            .fillMaxWidth()
                             .padding(8.dp)
                             .animateContentSize(),
                         text = singlePokemon.pokemonName,
-                        style = MaterialTheme.typography.h5
+                        style = MaterialTheme.typography.h4,
+                        textAlign = TextAlign.Center
                     )
 
                     Image(
