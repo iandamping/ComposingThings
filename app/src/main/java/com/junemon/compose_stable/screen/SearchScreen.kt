@@ -1,14 +1,10 @@
 package com.junemon.compose_stable.screen
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.ExperimentalUnitApi
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavHostController
@@ -17,7 +13,9 @@ import com.junemon.compose_stable.core.domain.model.DomainResult
 import com.junemon.compose_stable.core.domain.model.response.News
 import com.junemon.compose_stable.core.presentation.screens.SearchView
 import com.junemon.compose_stable.navigation.ScreensNavigation
-import timber.log.Timber
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 
 /**
@@ -35,19 +33,34 @@ fun ComposeSearchScreen(
 
     val lifecycleOwner = LocalLifecycleOwner.current
     val searchFlowLifecycleAware = remember(viewModel.getSearchState(), lifecycleOwner) {
-        viewModel.getSearchState().flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+        viewModel.getSearchState()
+            .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+    }
+    val searchStateFlowLifecycleAware = remember(viewModel.searchState, lifecycleOwner) {
+        viewModel.searchState
+            .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
     }
 
     val searchResults by searchFlowLifecycleAware.collectAsState(initial = DomainResult.Idle)
+    val searchStateResults by searchStateFlowLifecycleAware.collectAsState(initial = "")
 
-    SearchView(value = viewModel.searchState.collectAsState().value, onValueChange = { query ->
-        viewModel.setSearchState(query)
-    }) {
+    SearchView(
+        value = searchStateResults,
+        isSearched = viewModel.searchLoadingState.value,
+        onValueChange = { query ->
+            viewModel.setSearchState(query)
+        }) {
         when (searchResults) {
             is DomainResult.Data -> {
-                if ((searchResults as DomainResult.Data<List<News>>).data.isEmpty()){
-                    viewModel.FailedScreen(text = "News not find", modifier = modifier)
-                }else {
+
+                if ((searchResults as DomainResult.Data<List<News>>).data.isEmpty()) {
+                    with(viewModel){
+                        setLoadingSearchState(true)
+                        FailedScreen(text = "News not find", modifier = modifier)
+                    }
+
+
+                } else {
                     viewModel.ListNews(
                         news = (searchResults as DomainResult.Data<List<News>>).data,
                         modifier = modifier,
@@ -55,20 +68,33 @@ fun ComposeSearchScreen(
                             viewModel.setNewsDetail(Gson().toJson(it))
                             navController.navigate(ScreensNavigation.LoadDetail().name)
                         })
+                    viewModel.setLoadingSearchState(true)
                 }
 
             }
             is DomainResult.Error -> {
-                viewModel.FailedScreen(text = (searchResults as DomainResult.Error).message, modifier = modifier)
-            }
-            is DomainResult.Loading -> {
-                viewModel.LottieCirclingLoading(200.dp, modifier)
+                with(viewModel) {
+                    setLoadingSearchState(true)
+                    FailedScreen(
+                        text = (searchResults as DomainResult.Error).message,
+                        modifier = modifier
+                    )
+                }
             }
             is DomainResult.Idle -> {
-                Timber.e("idle state")
+                viewModel.setLoadingSearchState(true)
             }
         }
     }
+
+
+    LaunchedEffect(key1 = "search", block = {
+        viewModel.searchState.onEach { result ->
+            if (result.isNotEmpty()) {
+                viewModel.setLoadingSearchState(false)
+            }
+        }.launchIn(this)
+    })
 
     val backDispatcher = checkNotNull(LocalOnBackPressedDispatcherOwner.current) {
         "No OnBackPressedDispatcherOwner was provided via LocalOnBackPressedDispatcherOwner"

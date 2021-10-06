@@ -1,16 +1,14 @@
 package com.junemon.compose_stable.core.presentation.screens
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -32,17 +30,22 @@ import com.junemon.compose_stable.ui.theme.ComposingThingsTheme
 @ExperimentalUnitApi
 @Composable
 fun DefaultPreview() {
-//    var name = rememberSaveable { mutableStateOf("") }
+    var name = remember { mutableStateOf("") }
 //
 //    ComposingThingsTheme {
-//        SearchView(value = name.value, onValueChange = { name.value = it })
+//        SearchView(value = name.value, onValueChange = { name.value = it }, isSearched = true) {
+//
+//        }
 //    }
 }
 
 
 @Composable
-fun SearchView(value: String, onValueChange: (String) -> Unit,
-               content: @Composable () -> Unit) {
+fun SearchView(
+    value: String, onValueChange: (String) -> Unit,
+    isSearched: Boolean,
+    content: @Composable () -> Unit
+) {
     Column(
         Modifier
             .fillMaxSize()
@@ -63,18 +66,30 @@ fun SearchView(value: String, onValueChange: (String) -> Unit,
                 )
             },
             trailingIcon = {
-                if (value != TextFieldValue("").text) {
-                    IconButton(onClick = {
-                        onValueChange.invoke("")
-                    }) {
-                        Icon(
-                            Icons.Default.Close, contentDescription = null,
+                Row(verticalAlignment = Alignment.CenterVertically,horizontalArrangement = Arrangement.Center) {
+                    if (!isSearched) {
+                        CircularProgressIndicator(
+                            color = Color.White,
                             modifier = Modifier
-                                .size(40.dp)
-                                .padding(8.dp)
+                                .size(36.dp)
+                                .padding(horizontal = 6.dp)
                         )
                     }
+
+                    if (value != TextFieldValue("").text) {
+                        IconButton(onClick = {
+                            onValueChange.invoke("")
+                        }) {
+                            Icon(
+                                Icons.Default.Close, contentDescription = null,
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .padding(8.dp)
+                            )
+                        }
+                    }
                 }
+
             },
             colors = TextFieldDefaults.textFieldColors(
                 textColor = Color.White,
