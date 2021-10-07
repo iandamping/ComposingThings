@@ -37,9 +37,9 @@ fun HomeScreen(
     }
     val pokemonResult by pokemonFlowLifecycleAware.collectAsState(initial = UiState.Loading)
 
-    when (pokemonResult) {
+    when (val pokemonData: UiState<List<PokemonDetail>> = pokemonResult) {
         is UiState.Content -> pokemonVm.ListPokemon(
-            listOfPokemon = (pokemonResult as UiState.Content<List<PokemonDetail>>).data,
+            listOfPokemon = pokemonData.data,
             modifier = modifier,
             selectPokemon = { selectedPokemon ->
                 Timber.e("select pokemon : ${selectedPokemon.pokemonImage}")
@@ -50,7 +50,7 @@ fun HomeScreen(
 
         is UiState.Error -> Toast.makeText(
             LocalContext.current,
-            (pokemonResult as UiState.Error).message,
+            pokemonData.message,
             Toast.LENGTH_SHORT
         ).show()
 

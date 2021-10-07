@@ -2,7 +2,6 @@ package com.junemon.compose_stable.core.presentation.screens
 
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
-import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.updateTransition
@@ -14,20 +13,21 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.airbnb.lottie.compose.*
+import com.junemon.compose_stable.R
 import com.junemon.compose_stable.core.domain.response.PokemonDetail
 import com.junemon.compose_stable.core.presentation.ComposePagerSnapHelper
 import com.junemon.compose_stable.util.PokemonConstant
@@ -56,8 +56,13 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                     horizontalArrangement = Arrangement.spacedBy(Dp(8f))
                 ) {
                     items(listOfPokemon) { singlePokemonItem ->
+                        val randomName: MutableList<String> =
+                            listOfPokemon.shuffled().take(2).map { it.pokemonName }.toMutableList()
+                        randomName.add(singlePokemonItem.pokemonName)
+
                         PokemonItem(
                             singlePokemon = singlePokemonItem,
+                            randomName = randomName.shuffled(),
                             pokemonSelect = selectPokemon,
                             modifier = modifier.fillParentMaxWidth()
                         )
@@ -135,6 +140,7 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
     @Composable
     private fun PokemonItem(
         singlePokemon: PokemonDetail,
+        randomName: List<String>,
         pokemonSelect: (PokemonDetail) -> Unit,
         modifier: Modifier
     ) {
@@ -144,6 +150,10 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
         val transition = updateTransition(targetState = isExpanded, label = "")
         val pokemonImageSizeDp by transition.animateDp(targetValueByState = {
             if (it) 300.dp else 600.dp
+        }, label = "")
+
+        val pokemonLogoHeightDp by transition.animateDp(targetValueByState = {
+            if (it) 90.dp else 100.dp
         }, label = "")
 
         val listState = rememberScrollState()
@@ -189,6 +199,15 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                         contentDescription = null
                     )
 
+                    Image(
+                        painter = painterResource(R.drawable.pokemon_logo),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .height(pokemonLogoHeightDp)
+                            .fillMaxWidth(),
+                        contentScale = ContentScale.Crop
+                    )
+
                     ListOfPokemonSprite(
                         pokemonItem = singlePokemon,
                         modifier = modifier.fillMaxWidth()
@@ -201,18 +220,19 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                 }
 
             } else {
-                Column(
-                    modifier
-                        .padding(Dp(8f))
-                        .clickable {
-                            isExpanded = true
-//                            pokemonSelect(singlePokemon)
-                        },
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                Box(modifier = modifier.fillMaxSize()) {
                     val matrix = ColorMatrix()
                     matrix.setToSaturation(0F)
+
+
+                    Image(
+                        painter = painterResource(R.drawable.pokemon_logo),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .height(pokemonLogoHeightDp)
+                            .fillMaxWidth(),
+                        contentScale = ContentScale.Crop
+                    )
 
                     Image(
                         painter = rememberImagePainter(singlePokemon.pokemonImage, builder = {
@@ -224,9 +244,45 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                         colorFilter = ColorFilter.tint(Color.Gray),
                         contentDescription = null
                     )
-                }
-            }
 
+                    Column(
+                        modifier = modifier
+                            .fillMaxHeight()
+                            .padding(8.dp),
+                        verticalArrangement = Arrangement.Bottom
+                    ) {
+                        Button(
+                            modifier = modifier.padding(4.dp),
+                            elevation = ButtonDefaults.elevation(8.dp),
+                            shape = MaterialTheme.shapes.medium,
+                            onClick = {
+                                isExpanded = true
+                            }) {
+                            Text(text = randomName[0])
+                        }
+                        Button(
+                            modifier = modifier.padding(4.dp),
+                            elevation = ButtonDefaults.elevation(8.dp),
+                            shape = MaterialTheme.shapes.medium,
+                            onClick = {
+                                isExpanded = true
+                            }) {
+                            Text(text = randomName[1])
+                        }
+                        Button(
+                            modifier = modifier.padding(4.dp),
+                            elevation = ButtonDefaults.elevation(8.dp),
+                            shape = MaterialTheme.shapes.medium,
+                            onClick = {
+                                isExpanded = true
+                            }) {
+                            Text(text = randomName[2])
+                        }
+                    }
+
+                }
+
+            }
 
         }
     }
