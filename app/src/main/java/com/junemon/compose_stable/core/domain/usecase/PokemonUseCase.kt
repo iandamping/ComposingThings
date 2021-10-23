@@ -1,8 +1,8 @@
 package com.junemon.compose_stable.core.domain.usecase
 
-import com.junemon.compose_stable.core.domain.model.UiState
 import com.junemon.compose_stable.core.domain.response.PokemonDetail
 import com.junemon.compose_stable.core.domain.response.PokemonDetailSpecies
+import com.junemon.compose_stable.core.presentation.model.UiState
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.Flow
  * Indonesia.
  */
 interface PokemonUseCase {
-
 
     fun getPokemon(): Flow<UiState<List<PokemonDetail>>>
 

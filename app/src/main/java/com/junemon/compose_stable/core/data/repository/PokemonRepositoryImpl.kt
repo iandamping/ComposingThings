@@ -4,7 +4,7 @@ import com.junemon.compose_stable.core.data.datasource.PokemonRemoteDataSource
 import com.junemon.compose_stable.core.data.datasource.remote.NetworkConstant.EMPTY_DATA
 import com.junemon.compose_stable.core.data.datasource.remote.NetworkConstant.NETWORK_ERROR
 import com.junemon.compose_stable.core.data.model.DataSourceResult
-import com.junemon.compose_stable.core.domain.model.UiState
+import com.junemon.compose_stable.core.domain.model.DomainResult
 import com.junemon.compose_stable.core.domain.model.mapToDetail
 import com.junemon.compose_stable.core.domain.model.mapToSpeciesDetail
 import com.junemon.compose_stable.core.domain.repository.PokemonRepository
@@ -25,7 +25,7 @@ class PokemonRepositoryImpl @Inject constructor(
     PokemonRepository {
 
 
-    override fun getPokemon(): Flow<UiState<List<PokemonDetail>>> {
+    override fun getPokemon(): Flow<DomainResult<List<PokemonDetail>>> {
         return flow {
             when (val result = remoteDataSource.getPokemon()) {
                 is DataSourceResult.SourceValue -> {
@@ -33,11 +33,11 @@ class PokemonRepositoryImpl @Inject constructor(
                         remoteDataSource.getDetailPokemon(singleItem.pokemonUrl).mapToDetail()
                     }
                     if (data.isNullOrEmpty()) {
-                        emit(UiState.Error(EMPTY_DATA))
-                    } else emit(UiState.Content(data))
+                        emit(DomainResult.Error(EMPTY_DATA))
+                    } else emit(DomainResult.Content(data))
                 }
                 is DataSourceResult.SourceError -> {
-                    emit(UiState.Error(result.exception.message ?: NETWORK_ERROR))
+                    emit(DomainResult.Error(result.exception.message ?: NETWORK_ERROR))
                 }
             }
         }

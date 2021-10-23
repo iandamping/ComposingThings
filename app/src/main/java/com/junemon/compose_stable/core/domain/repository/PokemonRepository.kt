@@ -1,6 +1,6 @@
 package com.junemon.compose_stable.core.domain.repository
 
-import com.junemon.compose_stable.core.domain.model.UiState
+import com.junemon.compose_stable.core.domain.model.DomainResult
 import com.junemon.compose_stable.core.domain.response.PokemonDetail
 import com.junemon.compose_stable.core.domain.response.PokemonDetailSpecies
 import kotlinx.coroutines.flow.Flow
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
  */
 interface PokemonRepository {
 
-    fun getPokemon(): Flow<UiState<List<PokemonDetail>>>
+    fun getPokemon(): Flow<DomainResult<List<PokemonDetail>>>
 
     fun getDetailSpeciesPokemon(url: String): Flow<PokemonDetailSpecies>
 }

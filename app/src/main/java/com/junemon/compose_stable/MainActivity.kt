@@ -11,23 +11,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.compose.rememberNavController
-import coil.annotation.ExperimentalCoilApi
 import com.junemon.compose_stable.core.presentation.ComposingWithTheme
-import com.junemon.compose_stable.feature.PokemonViewModel
+import com.junemon.compose_stable.feature.PokemonMviViewModel
 import com.junemon.compose_stable.screen.HomeScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val pokemonVm: PokemonViewModel by viewModels()
+    private val pokemonVmMvi: PokemonMviViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ComposingWithTheme {
-                val navHostController = rememberNavController()
-
                 Box(modifier = Modifier.fillMaxSize()) {
                     Image(
                         painter = painterResource(R.drawable.ic_pokemon_bg_2),
@@ -36,8 +33,7 @@ class MainActivity : ComponentActivity() {
                             .fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
-                    HomeScreen(pokemonVm = pokemonVm)
-
+                    HomeScreen(pokemonMviVm = pokemonVmMvi)
                 }
 
             }
