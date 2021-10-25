@@ -43,7 +43,7 @@ fun DefaultPreview() {
 @Composable
 fun SearchView(
     value: String, onValueChange: (String) -> Unit,
-    isSearched: Boolean,
+//    isSearched: Boolean,
     content: @Composable () -> Unit
 ) {
     Column(
@@ -67,14 +67,14 @@ fun SearchView(
             },
             trailingIcon = {
                 Row(verticalAlignment = Alignment.CenterVertically,horizontalArrangement = Arrangement.Center) {
-                    if (!isSearched) {
-                        CircularProgressIndicator(
-                            color = Color.White,
-                            modifier = Modifier
-                                .size(36.dp)
-                                .padding(horizontal = 6.dp)
-                        )
-                    }
+//                    if (!isSearched) {
+//                        CircularProgressIndicator(
+//                            color = Color.White,
+//                            modifier = Modifier
+//                                .size(36.dp)
+//                                .padding(horizontal = 6.dp)
+//                        )
+//                    }
 
                     if (value != TextFieldValue("").text) {
                         IconButton(onClick = {

@@ -19,21 +19,22 @@ import com.junemon.compose_stable.navigation.ScreensNavigation
 @ExperimentalAnimationApi
 @Composable
 fun ComposeDetailNewsScreen(
-    viewModel: NewsViewModel,
+    sharedViewModel: ActivityRetainViewModel,
+    composableViewModel: ComposableViewModel,
     navController: NavHostController,
     modifier: Modifier
 ) {
-    val news = viewModel.newsDetailFlow.collectAsState(null)
-    val newsValue =  Gson().fromJson(news.value, News::class.java)
+    val news = sharedViewModel.newsDetailFlow.collectAsState(null)
 
     if (!news.value.isNullOrEmpty()) {
-        viewModel.NewsToolbar(
+        val newsValue =  Gson().fromJson(news.value, News::class.java)
+        composableViewModel.NewsToolbar(
             screen = ScreensNavigation.LoadDetail(),
             toolBarText = newsValue.sourceName,
             navigationClick = { navController.navigateUp() },
             actionClick = { navController.navigateUp() }) {
 
-            viewModel.NewsDetail(
+            composableViewModel.NewsDetail(
                 newsValue,
                 modifier = modifier,
                 navigationClick = { navController.navigateUp() },

@@ -94,6 +94,9 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
 
             Spacer(modifier = modifier.height(12.dp))
 
+//            val re = Regex("[^A-Za-z0-9 ]")
+//            answer = re.replace(answer, "")
+
             Text(
                 style = MaterialTheme.typography.body2,
                 text = news.newsContent,

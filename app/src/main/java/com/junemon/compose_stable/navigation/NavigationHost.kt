@@ -18,7 +18,10 @@ import com.junemon.compose_stable.screen.*
 @ExperimentalAnimationApi
 @Composable
 fun NavigationHost(
-    viewModel: NewsViewModel,
+    sharedViewModel: ActivityRetainViewModel,
+    composeViewModel: ComposableViewModel,
+    homeViewModel: HomeMviViewModel,
+    searchViewModel: SearchMviViewModel,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
@@ -33,26 +36,56 @@ fun NavigationHost(
 
         composable(ScreensNavigation.LoadHome().name) {
             ComposeHomeScreen(
-                viewModel = viewModel,
+                sharedViewModel = sharedViewModel,
+                homeViewModel = homeViewModel,
+                composableViewModel = composeViewModel,
                 navController = navController,
-                modifier = modifier
+                modifier = modifier,
+//                selectDetailNews = {
+//                    navigateToSingleNews(navController,it)
+//                }
             )
         }
         composable(ScreensNavigation.LoadSearch().name) {
             ComposeSearchScreen(
-                viewModel = viewModel,
+                sharedViewModel = sharedViewModel,
+                searchViewModel = searchViewModel,
+                composableViewModel = composeViewModel,
                 navController = navController,
                 modifier = modifier
             )
         }
 
+//        composable("${ScreensNavigation.LoadDetail().name}/{newsDetail}",
+//        arguments = listOf(navArgument("newsDetail"){
+//            type = NavType.StringType
+//        })) { entry ->
+//            val passedNewsDetail = entry.arguments?.getString("newsDetail")
+//            Timber.e("news  : $passedNewsDetail")
+//            val newsValue =  Gson().fromJson(passedNewsDetail, News::class.java)
+//            Timber.e("news passed : $newsValue")
+//            ComposeDetailNewsScreen(
+//                viewModel = mviViewModel,
+//                newsValue = newsValue,
+//                navController = navController,
+//                modifier = modifier
+//            )
+//        }
+
         composable(ScreensNavigation.LoadDetail().name) {
             ComposeDetailNewsScreen(
-                viewModel = viewModel,
+                sharedViewModel = sharedViewModel,
+                composableViewModel = composeViewModel,
                 navController = navController,
                 modifier = modifier
             )
         }
     }
+
+
+}
+
+private fun navigateToSingleNews(navController: NavHostController, newsDetail: String) {
+    navController.navigate("${ScreensNavigation.LoadDetail().name}/$newsDetail")
 }
 

@@ -1,7 +1,7 @@
 package com.junemon.compose_stable.core.domain.usecase
 
-import com.junemon.compose_stable.core.domain.model.DomainResult
 import com.junemon.compose_stable.core.domain.model.response.News
+import com.junemon.compose_stable.core.presentation.model.UiResult
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
  */
 interface NewsUseCase {
 
-    fun getNews(): Flow<DomainResult<List<News>>>
+    fun getNews(): Flow<UiResult<List<News>>>
 
-    fun searchNews(query: String): Flow<DomainResult<List<News>>>
+    fun searchNews(query: String): Flow<UiResult<List<News>>>
 }

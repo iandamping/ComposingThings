@@ -1,10 +1,7 @@
 package com.junemon.compose_stable.screen
 
 import android.content.Intent
-import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -19,10 +16,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavHostController
 import com.google.gson.Gson
-import com.junemon.compose_stable.core.domain.model.DomainResult
-import com.junemon.compose_stable.core.domain.model.response.News
+import com.junemon.compose_stable.core.presentation.model.HomeScreenState
 import com.junemon.compose_stable.navigation.ScreensNavigation
-import timber.log.Timber
 
 /**
  * Created by Ian Damping on 06,September,2021
@@ -32,44 +27,47 @@ import timber.log.Timber
 @ExperimentalUnitApi
 @Composable
 fun ComposeHomeScreen(
-    viewModel: NewsViewModel,
+    sharedViewModel: ActivityRetainViewModel,
+    homeViewModel: HomeMviViewModel,
+    composableViewModel: ComposableViewModel,
     navController: NavHostController,
+//    selectDetailNews: (String) ->Unit,
     modifier: Modifier
 ) {
 
     val lifecycleOwner = LocalLifecycleOwner.current
-    val homeNewsFlowLifecycleAware = remember(viewModel.getNews(), lifecycleOwner) {
-        viewModel.getNews().flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+    val homeNewsFlowLifecycleAware = remember(homeViewModel.state, lifecycleOwner) {
+        homeViewModel.state.flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
     }
-    val homeNews by homeNewsFlowLifecycleAware.collectAsState(initial = DomainResult.Loading)
+    val homeNews by homeNewsFlowLifecycleAware.collectAsState(initial = HomeScreenState.initial())
 
-    viewModel.NewsToolbar(screen = ScreensNavigation.LoadHome(),actionClick = {
-       navController.navigate(ScreensNavigation.LoadSearch().name)
+    composableViewModel.NewsToolbar(screen = ScreensNavigation.LoadHome(), actionClick = {
+        navController.navigate(ScreensNavigation.LoadSearch().name)
     }) {
-        when (val result: DomainResult<List<News>> = homeNews) {
-            is DomainResult.Data -> viewModel.ListNews(
-                news = result.data,
+        when {
+            homeNews.isLoading -> composableViewModel.LottieCirclingLoading(200.dp, modifier)
+            homeNews.failedMessage.isNotEmpty() -> composableViewModel.FailedScreen(
+                text = homeNews.failedMessage,
+                modifier = modifier
+            )
+            homeNews.data.isNotEmpty() -> composableViewModel.ListNews(
+                news = homeNews.data,
                 modifier = modifier,
                 newsSelect = {
-                    viewModel.setNewsDetail(Gson().toJson(it))
+//                    selectDetailNews(Gson().toJson(it))
+                    sharedViewModel.switchScreenNewsDetail(Gson().toJson(it))
                     navController.navigate(ScreensNavigation.LoadDetail().name)
                 })
-
-            is DomainResult.Error -> viewModel.FailedScreen(text = result.message, modifier = modifier)
-
-            DomainResult.Loading -> viewModel.LottieCirclingLoading(200.dp,modifier)
         }
     }
-
 
 
     val backDispatcher = checkNotNull(LocalOnBackPressedDispatcherOwner.current) {
         "No OnBackPressedDispatcherOwner was provided via LocalOnBackPressedDispatcherOwner"
     }.onBackPressedDispatcher
-    // val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
 
-    viewModel.BackHandler(backDispatcher = backDispatcher) {
+    composableViewModel.BackHandler(backDispatcher = backDispatcher) {
         val intent = Intent(Intent.ACTION_MAIN)
         intent.addCategory(Intent.CATEGORY_HOME)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK

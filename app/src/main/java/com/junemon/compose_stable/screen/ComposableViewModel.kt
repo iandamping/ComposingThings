@@ -2,60 +2,27 @@ package com.junemon.compose_stable.screen
 
 import androidx.activity.OnBackPressedDispatcher
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.junemon.compose_stable.core.domain.model.DomainResult
 import com.junemon.compose_stable.core.domain.model.response.News
-import com.junemon.compose_stable.core.domain.usecase.NewsUseCase
 import com.junemon.compose_stable.core.presentation.screens.ScreensUseCase
 import com.junemon.compose_stable.navigation.ScreensNavigation
-import com.junemon.compose_stable.util.search
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
 /**
- * Created by Ian Damping on 06,September,2021
+ * Created by Ian Damping on 24,October,2021
  * Github https://github.com/iandamping
  * Indonesia.
  */
 @HiltViewModel
-class NewsViewModel @Inject constructor(
-    private val domainUseCase: NewsUseCase,
+class ComposableViewModel @Inject constructor(
     private val screensUseCase: ScreensUseCase
 ) : ViewModel() {
-    var searchLoadingState =  mutableStateOf(false)
-    private val _searchState: MutableStateFlow<String> = MutableStateFlow("")
-    val searchState: StateFlow<String> = _searchState.asStateFlow()
-    private var _newsDetailState: Channel<String> = Channel(Channel.CONFLATED)
-
-    val newsDetailFlow: Flow<String?> =
-        _newsDetailState.receiveAsFlow().distinctUntilChanged()
-
-    fun setLoadingSearchState(isSearched:Boolean){
-        searchLoadingState.value = isSearched
-    }
-
-    fun setSearchState(data: String) {
-        _searchState.value = data
-    }
-
-    fun getSearchState() = searchState.search { query ->
-        domainUseCase.searchNews(query)
-    }
-
-    fun setNewsDetail(data: String) {
-        viewModelScope.launch {
-            _newsDetailState.send(data)
-        }
-    }
 
     @Composable
     fun NewsToolbar(
@@ -71,8 +38,6 @@ class NewsViewModel @Inject constructor(
         actionClick = actionClick,
         content = content
     )
-
-    fun getNews(): Flow<DomainResult<List<News>>> = domainUseCase.getNews()
 
     @ExperimentalUnitApi
     @Composable
@@ -120,4 +85,5 @@ class NewsViewModel @Inject constructor(
         backDispatcher: OnBackPressedDispatcher,
         onBack: () -> Unit
     ) = screensUseCase.BackHandler(backDispatcher = backDispatcher, enabled = true, onBack = onBack)
+
 }
