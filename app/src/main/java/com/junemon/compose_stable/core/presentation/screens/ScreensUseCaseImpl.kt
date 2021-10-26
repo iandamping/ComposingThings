@@ -127,6 +127,27 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
     }
 
     @Composable
+    override fun IdleScreen(text: String, modifier: Modifier) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_search),
+                contentDescription = null,
+                modifier = modifier.size(300.dp)
+            )
+            Text(
+                text = text,
+                style = MaterialTheme.typography.subtitle1,
+                textAlign = TextAlign.Center,
+                modifier = modifier.padding(8.dp)
+            )
+        }
+    }
+
+    @Composable
     override fun BackHandler(
         backDispatcher: OnBackPressedDispatcher,
         enabled: Boolean,

@@ -67,6 +67,10 @@ class ComposableViewModel @Inject constructor(
         screensUseCase.FailedScreen(text = text, modifier = modifier)
 
     @Composable
+    fun IdleScreen(text: String, modifier: Modifier) =
+        screensUseCase.IdleScreen(text = text, modifier = modifier)
+
+    @Composable
     fun LottieCirclingLoading(size: Dp, modifier: Modifier) =
         screensUseCase.LottieCirclingLoading(size, modifier)
 

@@ -55,7 +55,7 @@ fun ComposeSearchScreen(
             searchViewModel.setSearchState(query)
         }) {
         when {
-            searchNews.isLoading -> composableViewModel.FailedScreen(
+            searchNews.isLoading -> composableViewModel.IdleScreen(
                 text = SEARCH_NEWS,
                 modifier = modifier
             )

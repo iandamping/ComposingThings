@@ -42,6 +42,9 @@ interface ScreensUseCase {
     fun FailedScreen(text:String,modifier: Modifier)
 
     @Composable
+    fun IdleScreen(text:String,modifier: Modifier)
+
+    @Composable
     fun BackHandler(
         backDispatcher: OnBackPressedDispatcher,
         enabled: Boolean,
