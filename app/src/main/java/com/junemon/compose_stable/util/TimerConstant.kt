@@ -1,6 +1,7 @@
 package com.junemon.compose_stable.util
 
 import android.view.View
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -31,6 +32,10 @@ object TimerConstant {
     const val DONE_FLOAT = 0F
 
     const val ONE_SECOND = 1000L
+    val LIGHT_GREEN_1 = Color(0xFF37EFBA)
+    val LIGHT_GREEN_2 = Color(0xFF04B97F)
+    val DARK_GREEN_1 =  Color(0xFF005D57)
+    val DARK_GREEN_2 =   Color(0xFF004940)
 
     fun setCustomMinutes(data: Int) = data * 60 * 1000L
 
