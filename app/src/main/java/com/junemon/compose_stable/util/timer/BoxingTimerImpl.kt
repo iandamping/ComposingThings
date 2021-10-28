@@ -2,6 +2,7 @@ package com.junemon.compose_stable.util.timer
 
 import android.os.CountDownTimer
 import com.junemon.compose_stable.util.TimerConstant
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -11,7 +12,7 @@ import javax.inject.Inject
  */
 class BoxingTimerImpl @Inject constructor() : BoxingTimer {
 
-    private lateinit var timer: CountDownTimer
+    private var timer: CountDownTimer? = null
 
     override fun startTimer(durationTime: Long, onFinish: () -> Unit, onTicking: (Long) -> Unit) {
         timer = object : CountDownTimer(durationTime, TimerConstant.ONE_SECOND) {
@@ -26,8 +27,9 @@ class BoxingTimerImpl @Inject constructor() : BoxingTimer {
     }
 
     override fun stopTimer() {
-        if (::timer.isInitialized) {
-            timer.cancel()
+        if (timer !=null){
+            timer?.cancel()
+            timer = null
         }
     }
 

@@ -12,7 +12,6 @@ import com.junemon.compose_stable.util.timer.BoxingTimer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -25,16 +24,16 @@ import javax.inject.Inject
 class BoxingViewModel @Inject constructor(private val boxingTimer: BoxingTimer) : ViewModel() {
     private val _isTimerRunning: MutableLiveData<Boolean> = MutableLiveData()
     private val _loopingCounterValue: MutableLiveData<Int> = MutableLiveData()
-    private val _roundTimeValue: MutableLiveData<Long> = MutableLiveData()
     private val _currentTime: MutableStateFlow<Long?> = MutableStateFlow(null)
     private val _restTime: MutableStateFlow<Long?> = MutableStateFlow(null)
-    private val _pausedTime: MutableLiveData<Long> = MutableLiveData()
+    private val _pausedTime: MutableStateFlow<Long?> = MutableStateFlow(null)
     private val _currentTimeInFloat: MutableStateFlow<Float?> = MutableStateFlow(null)
+    private val _timerState: MutableStateFlow<TimerState> = MutableStateFlow(TimerState.RoundTime)
 
     val loopingCounterValue: LiveData<Int>
         get() = _loopingCounterValue
 
-    val pausedTime: LiveData<Long>
+    val pausedTime: StateFlow<Long?>
         get() = _pausedTime
 
     val restTime: StateFlow<Long?>
@@ -46,11 +45,11 @@ class BoxingViewModel @Inject constructor(private val boxingTimer: BoxingTimer) 
     val currentTimeInFloat: StateFlow<Float?>
         get() = _currentTimeInFloat
 
-    val roundTimeValue: LiveData<Long>
-        get() = _roundTimeValue
-
     val isTimerRunning: MutableLiveData<Boolean>
         get() = _isTimerRunning
+
+    val timerState: StateFlow<TimerState>
+        get() = _timerState
 
     fun setTimerIsRunning(data: Boolean) {
         _isTimerRunning.value = data
@@ -58,6 +57,10 @@ class BoxingViewModel @Inject constructor(private val boxingTimer: BoxingTimer) 
 
     fun setLoopingCounterRound(data: Int) {
         _loopingCounterValue.value = data
+    }
+
+    fun setTimerState(state: TimerState) {
+        _timerState.value = state
     }
 
     fun setRestTime(data: Int) {
@@ -68,24 +71,7 @@ class BoxingViewModel @Inject constructor(private val boxingTimer: BoxingTimer) 
         }
     }
 
-    fun setRoundTime(data: Int) {
-        _roundTimeValue.value = when (data) {
-            0 -> TimerConstant.setCustomTime(30)
-            1 -> TimerConstant.setCustomMinutes(1)
-            2 -> TimerConstant.setCustomMinutes(2)
-            3 -> TimerConstant.setCustomMinutes(3)
-            4 -> TimerConstant.setCustomMinutes(4)
-            5 -> TimerConstant.setCustomMinutes(5)
-            6 -> TimerConstant.setCustomMinutes(6)
-            7 -> TimerConstant.setCustomMinutes(7)
-            8 -> TimerConstant.setCustomMinutes(8)
-            9 -> TimerConstant.setCustomMinutes(9)
-            10 -> TimerConstant.setCustomMinutes(10)
-            else -> TimerConstant.setCustomMinutes(25)
-        }
-    }
-
-    fun startTimer(durationTime: Long, finishTicking: () -> Unit) {
+    fun startTimer(durationTime: Long, finishTicking: () -> Unit = {}) {
         boxingTimer.startTimer(durationTime = durationTime,
             onFinish = {
                 _currentTime.value = DONE
@@ -95,14 +81,20 @@ class BoxingViewModel @Inject constructor(private val boxingTimer: BoxingTimer) 
             }, onTicking = { millisUntilFinished ->
                 _currentTime.value = (millisUntilFinished / ONE_SECOND)
                 _pausedTime.value = (millisUntilFinished / ONE_SECOND)
-                _currentTimeInFloat.value = setCustomFloat(durationTime,(millisUntilFinished / ONE_SECOND))
+                _currentTimeInFloat.value =
+                    setCustomFloat(durationTime, (millisUntilFinished / ONE_SECOND))
             })
+    }
+
+
+    fun pauseTimer() {
+        boxingTimer.stopTimer()
     }
 
     fun cancelAllTimer() {
         boxingTimer.stopTimer()
-        _currentTime.value = DONE
-        _pausedTime.value = DONE
+        _currentTime.value = null
+        _pausedTime.value = null
         _currentTimeInFloat.value = DONE_FLOAT
     }
 

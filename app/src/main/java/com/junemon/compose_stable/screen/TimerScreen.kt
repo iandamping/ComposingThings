@@ -25,6 +25,7 @@ import com.junemon.compose_stable.ui.theme.CalculatorFontFamily
 import com.junemon.compose_stable.util.TimerConstant
 import com.junemon.compose_stable.util.TimerConstant.LIGHT_GREEN_1
 import com.junemon.compose_stable.util.TimerConstant.LIGHT_GREEN_2
+import timber.log.Timber
 
 
 /**
@@ -153,6 +154,12 @@ fun RestTimeRadioButton(modifier: Modifier = Modifier, itemSelected: (Int) -> Un
             .fillMaxWidth()
             .padding(12.dp)
     ) {
+        Text(
+            text = "Pick how long to rest",
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 8.dp, bottom = 8.dp)
+        )
         SimpleRadioButtonComponent(item = TimerConstant.listOfRestTime) {
             itemSelected.invoke(it)
         }

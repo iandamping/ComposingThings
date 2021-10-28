@@ -2,12 +2,8 @@ package com.junemon.compose_stable.util
 
 import android.view.View
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import com.junemon.compose_stable.R
 import com.junemon.compose_stable.RestTime
+import timber.log.Timber
 
 /**
  * Created by Ian Damping on 18,October,2019
@@ -49,22 +45,13 @@ object TimerConstant {
 
     fun setCustomTime(data: Int) = data * 1000L
 
-    fun setCustomFloat(data: Long, ticking: Long) = when (data) {
-        1 * 60 * 1000L -> 1 - (ticking.toFloat() / 60)
-        2 * 60 * 1000L -> 1 - (ticking.toFloat() / 120)
+    fun setCustomFloat(data: Long, ticking: Long):Float = when (data) {
         3 * 60 * 1000L -> 1 - (ticking.toFloat() / 180)
-        4 * 60 * 1000L -> 1 - (ticking.toFloat() / 240)
         5 * 60 * 1000L -> 1 - (ticking.toFloat() / 300)
-        6 * 60 * 1000L -> 1 - (ticking.toFloat() / 360)
-        7 * 60 * 1000L -> 1 - (ticking.toFloat() / 420)
-        8 * 60 * 1000L -> 1 - (ticking.toFloat() / 480)
-        9 * 60 * 1000L -> 1 - (ticking.toFloat() / 540)
         10 * 60 * 1000L -> 1 - (ticking.toFloat() / 600)
         25 * 60 * 1000L -> 1 - (ticking.toFloat() / 1500)
-        else -> 1 - (ticking.toFloat() / 30)
+        else -> 1 - (ticking.toFloat() / 1500)
     }
-
-
 
     /** Combination of all flags required to put activity into immersive mode */
     const val FLAGS_FULLSCREEN =
