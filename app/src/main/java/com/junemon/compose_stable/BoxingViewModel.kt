@@ -23,9 +23,22 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class BoxingViewModel @Inject constructor(private val boxingTimer: BoxingTimer) : ViewModel() {
+    private val _isTimerRunning: MutableLiveData<Boolean> = MutableLiveData()
+    private val _loopingCounterValue: MutableLiveData<Int> = MutableLiveData()
     private val _roundTimeValue: MutableLiveData<Long> = MutableLiveData()
     private val _currentTime: MutableStateFlow<Long?> = MutableStateFlow(null)
+    private val _restTime: MutableStateFlow<Long?> = MutableStateFlow(null)
+    private val _pausedTime: MutableLiveData<Long> = MutableLiveData()
     private val _currentTimeInFloat: MutableStateFlow<Float?> = MutableStateFlow(null)
+
+    val loopingCounterValue: LiveData<Int>
+        get() = _loopingCounterValue
+
+    val pausedTime: LiveData<Long>
+        get() = _pausedTime
+
+    val restTime: StateFlow<Long?>
+        get() = _restTime
 
     val currentTime: StateFlow<Long?>
         get() = _currentTime
@@ -36,6 +49,24 @@ class BoxingViewModel @Inject constructor(private val boxingTimer: BoxingTimer) 
     val roundTimeValue: LiveData<Long>
         get() = _roundTimeValue
 
+    val isTimerRunning: MutableLiveData<Boolean>
+        get() = _isTimerRunning
+
+    fun setTimerIsRunning(data: Boolean) {
+        _isTimerRunning.value = data
+    }
+
+    fun setLoopingCounterRound(data: Int) {
+        _loopingCounterValue.value = data
+    }
+
+    fun setRestTime(data: Int) {
+        _restTime.value = when (data) {
+            3 -> TimerConstant.setCustomMinutes(3)
+            5 -> TimerConstant.setCustomMinutes(5)
+            else -> TimerConstant.setCustomMinutes(10)
+        }
+    }
 
     fun setRoundTime(data: Int) {
         _roundTimeValue.value = when (data) {
@@ -49,7 +80,8 @@ class BoxingViewModel @Inject constructor(private val boxingTimer: BoxingTimer) 
             7 -> TimerConstant.setCustomMinutes(7)
             8 -> TimerConstant.setCustomMinutes(8)
             9 -> TimerConstant.setCustomMinutes(9)
-            else -> TimerConstant.setCustomMinutes(10)
+            10 -> TimerConstant.setCustomMinutes(10)
+            else -> TimerConstant.setCustomMinutes(25)
         }
     }
 
@@ -57,16 +89,21 @@ class BoxingViewModel @Inject constructor(private val boxingTimer: BoxingTimer) 
         boxingTimer.startTimer(durationTime = durationTime,
             onFinish = {
                 _currentTime.value = DONE
+                _pausedTime.value = DONE
                 _currentTimeInFloat.value = DONE_FLOAT
                 finishTicking.invoke()
             }, onTicking = { millisUntilFinished ->
                 _currentTime.value = (millisUntilFinished / ONE_SECOND)
+                _pausedTime.value = (millisUntilFinished / ONE_SECOND)
                 _currentTimeInFloat.value = setCustomFloat(durationTime,(millisUntilFinished / ONE_SECOND))
             })
     }
 
     fun cancelAllTimer() {
         boxingTimer.stopTimer()
+        _currentTime.value = DONE
+        _pausedTime.value = DONE
+        _currentTimeInFloat.value = DONE_FLOAT
     }
 
 }
