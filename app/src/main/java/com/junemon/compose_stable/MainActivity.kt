@@ -19,13 +19,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import com.junemon.compose_stable.screen.*
 import com.junemon.compose_stable.ui.theme.TimerTheme
-import com.junemon.compose_stable.util.TimerConstant
 import com.junemon.compose_stable.util.TimerConstant.ONE_SECOND
+import com.junemon.compose_stable.util.TimerConstant.setCustomMinutes
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     private val boxingVm: BoxingViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,13 +33,94 @@ class MainActivity : ComponentActivity() {
         setContent {
             TimerTheme {
                 val lifecycleOwner = LocalLifecycleOwner.current
+                val currentTimeLifecycle = remember(boxingVm.currentTime, lifecycleOwner) {
+                    boxingVm.currentTime.flowWithLifecycle(
+                        lifecycleOwner.lifecycle,
+                        Lifecycle.State.STARTED
+                    )
+                }
                 val pauseTimeLifecycle = remember(boxingVm.pausedTime, lifecycleOwner) {
                     boxingVm.pausedTime.flowWithLifecycle(
                         lifecycleOwner.lifecycle,
                         Lifecycle.State.STARTED
                     )
                 }
+                val restTimeLifecycle = remember(boxingVm.restTime, lifecycleOwner) {
+                    boxingVm.restTime.flowWithLifecycle(
+                        lifecycleOwner.lifecycle,
+                        Lifecycle.State.STARTED
+                    )
+                }
+
+                val timerStateLifecycle = remember(boxingVm.timerState, lifecycleOwner) {
+                    boxingVm.timerState.flowWithLifecycle(
+                        lifecycleOwner.lifecycle,
+                        Lifecycle.State.STARTED
+                    )
+                }
+                val currentTime by currentTimeLifecycle.collectAsState(null)
+                val isTimerRunning by boxingVm.isTimerRunning.observeAsState()
                 val pauseTime by pauseTimeLifecycle.collectAsState(initial = null)
+                val restTime by restTimeLifecycle.collectAsState(initial = 3)
+                val timerState by timerStateLifecycle.collectAsState(
+                    TimerState.RoundTime(
+                        setCustomMinutes(25)
+                    )
+                )
+                isTimerRunning?.let { nonNull ->
+                    if (nonNull) {
+                        when (timerState) {
+                            is TimerState.RestTime -> {
+                                if (pauseTime != null) {
+                                    boxingVm.startTimer(
+                                        durationTime = pauseTime!!.toInt() * ONE_SECOND,
+                                        durationTimes = setCustomMinutes(restTime),
+                                        finishTicking = {
+                                            with(boxingVm){
+                                                startRoundSound()
+                                                setRoundTimeState(25)
+                                            }
+                                        })
+                                } else {
+                                    boxingVm.startTimer(
+                                        durationTime = (timerState as TimerState.RestTime).time,
+                                        durationTimes = null,
+                                        finishTicking = {
+                                            with(boxingVm){
+                                                startRoundSound()
+                                                setRoundTimeState(25)
+                                            }
+                                        })
+                                }
+                            }
+                            is TimerState.RoundTime -> {
+                                if (pauseTime != null) {
+                                    boxingVm.startTimer(
+                                        durationTime = pauseTime!!.toInt() * ONE_SECOND,
+                                        durationTimes = setCustomMinutes(25),
+                                        finishTicking = {
+                                            with(boxingVm) {
+                                                endRoundSound()
+                                                incrementPomodoroRound()
+                                                setRestTimeState(restTime)
+                                            }
+                                        })
+                                } else {
+                                    boxingVm.startTimer(durationTime = (timerState as TimerState.RoundTime).time,
+                                        durationTimes = null,
+                                        finishTicking = {
+                                            with(boxingVm) {
+                                                endRoundSound()
+                                                incrementPomodoroRound()
+                                                setRestTimeState(restTime)
+                                            }
+                                        })
+                                }
+                            }
+                        }
+                    }
+                }
+
 
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
@@ -52,6 +133,7 @@ class MainActivity : ComponentActivity() {
                                 .padding(12.dp)
                         )
 
+
                         RestTimeRadioButton { restTime ->
                             boxingVm.setRestTime(restTime)
                         }
@@ -61,17 +143,25 @@ class MainActivity : ComponentActivity() {
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             StartTimerButton {
-                                if (pauseTime!=null){
-                                    boxingVm.startTimer(pauseTime!!.toInt() * ONE_SECOND)
-                                }else {
-                                    boxingVm.startTimer(TimerConstant.setCustomMinutes(25))
+                                with(boxingVm){
+                                    setTimerIsRunning(true)
+                                    startRoundSound()
                                 }
+
                             }
                             PauseTimerButton {
-                                boxingVm.pauseTimer()
+                                currentTime?.let {
+                                    with(boxingVm) {
+                                        setTimerIsRunning(false)
+                                        pauseTimer(it)
+                                    }
+                                }
                             }
                             ResetTimerButton {
-                                boxingVm.cancelAllTimer()
+                                with(boxingVm){
+                                    setTimerIsRunning(false)
+                                    cancelAllTimer()
+                                }
                             }
                         }
                     }
@@ -79,7 +169,11 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
 }
+
+
+
 
 
 

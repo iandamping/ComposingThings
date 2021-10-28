@@ -7,6 +7,6 @@ package com.junemon.compose_stable
  * Indonesia.
  */
 sealed class TimerState {
-    object RoundTime : TimerState()
-    object RestTime : TimerState()
+    data class RoundTime(val time:Long) : TimerState()
+    data class RestTime(val time:Long) : TimerState()
 }

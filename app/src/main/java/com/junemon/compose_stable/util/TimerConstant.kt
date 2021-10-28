@@ -16,6 +16,8 @@ object TimerConstant {
     const val IMMERSIVE_FLAG_TIMEOUT = 500L
 
     const val DEFAULT_INTEGER_VALUE = 0
+    const val DEFAULT_POMODORO_ROUND = 1
+    const val MAX_POMODORO_ROUND = 4
     const val DEFAULT_LONG_VALUE = 0L
     const val ROUND_TIME_STATE = 0
     const val REST_TIME_STATE = 1
@@ -46,8 +48,15 @@ object TimerConstant {
     fun setCustomTime(data: Int) = data * 1000L
 
     fun setCustomFloat(data: Long, ticking: Long):Float = when (data) {
+        1 * 60 * 1000L -> 1 - (ticking.toFloat() / 60)
+        2 * 60 * 1000L -> 1 - (ticking.toFloat() / 120)
         3 * 60 * 1000L -> 1 - (ticking.toFloat() / 180)
+        4 * 60 * 1000L -> 1 - (ticking.toFloat() / 240)
         5 * 60 * 1000L -> 1 - (ticking.toFloat() / 300)
+        6 * 60 * 1000L -> 1 - (ticking.toFloat() / 360)
+        7 * 60 * 1000L -> 1 - (ticking.toFloat() / 420)
+        8 * 60 * 1000L -> 1 - (ticking.toFloat() / 480)
+        9 * 60 * 1000L -> 1 - (ticking.toFloat() / 540)
         10 * 60 * 1000L -> 1 - (ticking.toFloat() / 600)
         25 * 60 * 1000L -> 1 - (ticking.toFloat() / 1500)
         else -> 1 - (ticking.toFloat() / 1500)

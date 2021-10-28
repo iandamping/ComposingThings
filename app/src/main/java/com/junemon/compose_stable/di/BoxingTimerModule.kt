@@ -1,5 +1,7 @@
 package com.junemon.compose_stable.di
 
+import com.junemon.compose_stable.util.ringer.BellRinger
+import com.junemon.compose_stable.util.ringer.BellRingerImpl
 import com.junemon.compose_stable.util.timer.BoxingTimer
 import com.junemon.compose_stable.util.timer.BoxingTimerImpl
 import dagger.Binds
@@ -21,4 +23,8 @@ interface BoxingTimerModule {
     @Binds
     @Singleton
     fun bindsBoxingTimer(boxingTimerImpl: BoxingTimerImpl): BoxingTimer
+
+    @Binds
+    @Singleton
+    fun bindsBellRinger(ringerImpl: BellRingerImpl): BellRinger
 }
