@@ -8,19 +8,13 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
 import com.junemon.compose_stable.screen.*
 import com.junemon.compose_stable.ui.theme.TimerTheme
-import com.junemon.compose_stable.util.TimerConstant.ONE_SECOND
-import com.junemon.compose_stable.util.TimerConstant.setCustomMinutes
+import com.junemon.compose_stable.util.TimerConstant
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -32,98 +26,22 @@ class MainActivity : ComponentActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContent {
             TimerTheme {
-                val lifecycleOwner = LocalLifecycleOwner.current
-                val currentTimeLifecycle = remember(boxingVm.currentTime, lifecycleOwner) {
-                    boxingVm.currentTime.flowWithLifecycle(
-                        lifecycleOwner.lifecycle,
-                        Lifecycle.State.STARTED
-                    )
-                }
-                val pauseTimeLifecycle = remember(boxingVm.pausedTime, lifecycleOwner) {
-                    boxingVm.pausedTime.flowWithLifecycle(
-                        lifecycleOwner.lifecycle,
-                        Lifecycle.State.STARTED
-                    )
-                }
-                val restTimeLifecycle = remember(boxingVm.restTime, lifecycleOwner) {
-                    boxingVm.restTime.flowWithLifecycle(
-                        lifecycleOwner.lifecycle,
-                        Lifecycle.State.STARTED
-                    )
-                }
-
-                val timerStateLifecycle = remember(boxingVm.timerState, lifecycleOwner) {
-                    boxingVm.timerState.flowWithLifecycle(
-                        lifecycleOwner.lifecycle,
-                        Lifecycle.State.STARTED
-                    )
-                }
-                val currentTime by currentTimeLifecycle.collectAsState(null)
-                val isTimerRunning by boxingVm.isTimerRunning.observeAsState()
-                val pauseTime by pauseTimeLifecycle.collectAsState(initial = null)
-                val restTime by restTimeLifecycle.collectAsState(initial = 3)
-                val timerState by timerStateLifecycle.collectAsState(
-                    TimerState.RoundTime(
-                        setCustomMinutes(25)
-                    )
-                )
-                isTimerRunning?.let { nonNull ->
-                    if (nonNull) {
-                        when (timerState) {
-                            is TimerState.RestTime -> {
-                                if (pauseTime != null) {
-                                    boxingVm.startTimer(
-                                        durationTime = pauseTime!!.toInt() * ONE_SECOND,
-                                        durationTimes = setCustomMinutes(restTime),
-                                        finishTicking = {
-                                            with(boxingVm){
-                                                startRoundSound()
-                                                setRoundTimeState(25)
-                                            }
-                                        })
-                                } else {
-                                    boxingVm.startTimer(
-                                        durationTime = (timerState as TimerState.RestTime).time,
-                                        durationTimes = null,
-                                        finishTicking = {
-                                            with(boxingVm){
-                                                startRoundSound()
-                                                setRoundTimeState(25)
-                                            }
-                                        })
-                                }
-                            }
-                            is TimerState.RoundTime -> {
-                                if (pauseTime != null) {
-                                    boxingVm.startTimer(
-                                        durationTime = pauseTime!!.toInt() * ONE_SECOND,
-                                        durationTimes = setCustomMinutes(25),
-                                        finishTicking = {
-                                            with(boxingVm) {
-                                                endRoundSound()
-                                                incrementPomodoroRound()
-                                                setRestTimeState(restTime)
-                                            }
-                                        })
-                                } else {
-                                    boxingVm.startTimer(durationTime = (timerState as TimerState.RoundTime).time,
-                                        durationTimes = null,
-                                        finishTicking = {
-                                            with(boxingVm) {
-                                                endRoundSound()
-                                                incrementPomodoroRound()
-                                                setRestTimeState(restTime)
-                                            }
-                                        })
-                                }
-                            }
-                        }
-                    }
-                }
-
+                val currentTime by boxingVm.currentTime.observeAsState()
+                val isTimerRunning by boxingVm.isTimerRunning.observeAsState(false)
+                val pauseTime by boxingVm.pausedTime.observeAsState()
+                val restTime by boxingVm.restTime.observeAsState(3)
+                val timerState by boxingVm.timerState.observeAsState()
 
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
+                    TimerController(
+                        timerViewModel = boxingVm,
+                        isTimerRunning = isTimerRunning,
+                        pauseTime = pauseTime,
+                        restTime = restTime,
+                        timerState = timerState
+                    )
+
                     Column(modifier = Modifier.fillMaxSize()) {
                         TimerScreen(
                             timerViewModel = boxingVm,
@@ -133,8 +51,10 @@ class MainActivity : ComponentActivity() {
                                 .padding(12.dp)
                         )
 
-
-                        RestTimeRadioButton { restTime ->
+                        RestTimeRadioButton(
+                            item = TimerConstant.listOfRestTime,
+                            isRadioButtonEnabled = isTimerRunning
+                        ) { restTime ->
                             boxingVm.setRestTime(restTime)
                         }
 
@@ -143,7 +63,7 @@ class MainActivity : ComponentActivity() {
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             StartTimerButton {
-                                with(boxingVm){
+                                with(boxingVm) {
                                     setTimerIsRunning(true)
                                     startRoundSound()
                                 }
@@ -158,7 +78,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                             ResetTimerButton {
-                                with(boxingVm){
+                                with(boxingVm) {
                                     setTimerIsRunning(false)
                                     cancelAllTimer()
                                 }
@@ -169,6 +89,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
 
 }
 

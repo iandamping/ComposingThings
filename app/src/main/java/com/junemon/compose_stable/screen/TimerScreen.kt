@@ -7,25 +7,23 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
 import com.junemon.compose_stable.BoxingViewModel
 import com.junemon.compose_stable.RestTime
+import com.junemon.compose_stable.TimerState
 import com.junemon.compose_stable.ui.theme.CalculatorFontFamily
 import com.junemon.compose_stable.util.TimerConstant
 import com.junemon.compose_stable.util.TimerConstant.LIGHT_GREEN_1
 import com.junemon.compose_stable.util.TimerConstant.LIGHT_GREEN_2
-import timber.log.Timber
 
 
 /**
@@ -39,23 +37,9 @@ fun TimerScreen(
     timerViewModel: BoxingViewModel,
     modifier: Modifier = Modifier
 ) {
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val timeTickingLifecycle = remember(timerViewModel.currentTime, lifecycleOwner) {
-        timerViewModel.currentTime.flowWithLifecycle(
-            lifecycleOwner.lifecycle,
-            Lifecycle.State.STARTED
-        )
-    }
-    val timeTickingInFloatLifecycle =
-        remember(timerViewModel.currentTimeInFloat, lifecycleOwner) {
-            timerViewModel.currentTimeInFloat.flowWithLifecycle(
-                lifecycleOwner.lifecycle,
-                Lifecycle.State.STARTED
-            )
-        }
 
-    val timeTickingForText by timeTickingLifecycle.collectAsState(null)
-    val timeTickingForDialog by timeTickingInFloatLifecycle.collectAsState(null)
+    val timeTickingForText by timerViewModel.currentTime.observeAsState()
+    val timeTickingForDialog by timerViewModel.currentTimeInFloat.observeAsState()
 
     Box(
         modifier = modifier,
@@ -148,7 +132,16 @@ fun UnderlyingCircle() {
 }
 
 @Composable
-fun RestTimeRadioButton(modifier: Modifier = Modifier, itemSelected: (Int) -> Unit) {
+fun RestTimeRadioButton(
+    modifier: Modifier = Modifier,
+    isRadioButtonEnabled: Boolean,
+    item: List<RestTime>,
+    itemSelected: (Int) -> Unit
+) {
+    val (selectedOption, onOptionSelected) = remember { mutableStateOf(item[0]) }
+    val state = rememberScrollState()
+    LaunchedEffect(Unit) { state.animateScrollTo(100) }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -160,70 +153,57 @@ fun RestTimeRadioButton(modifier: Modifier = Modifier, itemSelected: (Int) -> Un
                 .align(Alignment.CenterHorizontally)
                 .padding(top = 8.dp, bottom = 8.dp)
         )
-        SimpleRadioButtonComponent(item = TimerConstant.listOfRestTime) {
-            itemSelected.invoke(it)
-        }
-    }
-}
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .horizontalScroll(state),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            item.forEach { text ->
+                Row(
+                    Modifier
+                        .wrapContentWidth()
+                        .selectable(
+                            // this method is called when
+                            // radio button is selected.
+                            selected = (text == selectedOption),
+                            onClick = {
+                                onOptionSelected(text)
+                                itemSelected(text.time)
+                            },
+                            enabled = !isRadioButtonEnabled
+                        )
+                        // below line is use to add
+                        // padding to radio button.
+                        .padding(horizontal = 4.dp)
 
-@Composable
-fun SimpleRadioButtonComponent(
-    modifier: Modifier = Modifier,
-    item: List<RestTime>,
-    itemSelected: (Int) -> Unit
-) {
-    val (selectedOption, onOptionSelected) = remember { mutableStateOf(item[0]) }
-    val state = rememberScrollState()
-    LaunchedEffect(Unit) { state.animateScrollTo(100) }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp)
-            .horizontalScroll(state),
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-        item.forEach { text ->
-            Row(
-                Modifier
-                    .wrapContentWidth()
-                    .selectable(
-                        // this method is called when
-                        // radio button is selected.
+                ) {
+                    // below line is use to
+                    // generate radio button
+                    RadioButton(
+                        // inside this method we are
+                        // adding selected with a option.
                         selected = (text == selectedOption),
                         onClick = {
+                            // inide on click method we are setting a
+                            // selected option of our radio buttons.
                             onOptionSelected(text)
                             itemSelected(text.time)
-                        }
+                        },
+                        enabled = !isRadioButtonEnabled
                     )
                     // below line is use to add
-                    // padding to radio button.
-                    .padding(horizontal = 4.dp)
-
-            ) {
-                // below line is use to
-                // generate radio button
-                RadioButton(
-                    // inside this method we are
-                    // adding selected with a option.
-                    selected = (text == selectedOption),
-                    onClick = {
-                        // inide on click method we are setting a
-                        // selected option of our radio buttons.
-                        onOptionSelected(text)
-                        itemSelected(text.time)
-                    }
-                )
-                // below line is use to add
-                // text to our radio buttons.
-                Text(
-                    text = text.name,
-                    modifier = Modifier
-                        .padding(start = 2.dp)
-                        .align(Alignment.CenterVertically)
-                )
+                    // text to our radio buttons.
+                    Text(
+                        text = text.name,
+                        modifier = Modifier
+                            .padding(start = 2.dp)
+                            .align(Alignment.CenterVertically)
+                    )
+                }
+                Spacer(modifier = Modifier.padding(4.dp))
             }
-            Spacer(modifier = Modifier.padding(4.dp))
         }
     }
 }
@@ -246,6 +226,67 @@ fun PauseTimerButton(buttonClicked: () -> Unit) {
 fun ResetTimerButton(buttonClicked: () -> Unit) {
     Button(onClick = buttonClicked) {
         Text(text = "Reset")
+    }
+}
+
+@Composable
+fun TimerController(
+    timerViewModel: BoxingViewModel,
+    isTimerRunning: Boolean,
+    pauseTime: Long?,
+    restTime: Int,
+    timerState: TimerState?,
+) {
+    if (isTimerRunning) {
+        when (timerState) {
+            is TimerState.RestTime -> {
+                if (pauseTime != null) {
+                    timerViewModel.startTimer(
+                        durationTime = pauseTime.toInt() * TimerConstant.ONE_SECOND,
+                        durationTimes = TimerConstant.setCustomMinutes(restTime),
+                        finishTicking = {
+                            with(timerViewModel) {
+                                startRoundSound()
+                                setRoundTimeState(25)
+                            }
+                        })
+                } else {
+                    timerViewModel.startTimer(
+                        durationTime = timerState.time,
+                        durationTimes = null,
+                        finishTicking = {
+                            with(timerViewModel) {
+                                startRoundSound()
+                                setRoundTimeState(25)
+                            }
+                        })
+                }
+            }
+            is TimerState.RoundTime -> {
+                if (pauseTime != null) {
+                    timerViewModel.startTimer(
+                        durationTime = pauseTime.toInt() * TimerConstant.ONE_SECOND,
+                        durationTimes = TimerConstant.setCustomMinutes(25),
+                        finishTicking = {
+                            with(timerViewModel) {
+                                endRoundSound()
+                                incrementPomodoroRound()
+                                setRestTimeState(restTime)
+                            }
+                        })
+                } else {
+                    timerViewModel.startTimer(durationTime = timerState.time,
+                        durationTimes = null,
+                        finishTicking = {
+                            with(timerViewModel) {
+                                endRoundSound()
+                                incrementPomodoroRound()
+                                setRestTimeState(restTime)
+                            }
+                        })
+                }
+            }
+        }
     }
 }
 

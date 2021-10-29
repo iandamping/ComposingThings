@@ -1,9 +1,7 @@
 package com.junemon.compose_stable
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import com.junemon.compose_stable.base.BaseViewModel
 import com.junemon.compose_stable.util.TimerConstant
 import com.junemon.compose_stable.util.TimerConstant.DEFAULT_POMODORO_ROUND
 import com.junemon.compose_stable.util.TimerConstant.DONE
@@ -31,10 +29,10 @@ import javax.inject.Inject
 class BoxingViewModel @Inject constructor(
     private val boxingTimer: BoxingTimer,
     private val bellRinger: BellRinger
-) : ViewModel() {
+) : BaseViewModel() {
 
     private var pomodoroRound = DEFAULT_POMODORO_ROUND
-    private val _isTimerRunning: MutableLiveData<Boolean> = MutableLiveData()
+    private val _isTimerRunning: MutableStateFlow<Boolean> = MutableStateFlow(false)
     private val _currentPomodoroRound: MutableStateFlow<Int> =
         MutableStateFlow(DEFAULT_POMODORO_ROUND)
     private val _currentTime: MutableStateFlow<Long?> = MutableStateFlow(null)
@@ -45,10 +43,9 @@ class BoxingViewModel @Inject constructor(
         MutableStateFlow(TimerState.RoundTime(TimerConstant.setCustomMinutes(25)))
 
     init {
-        viewModelScope.launch {
+        consumeSuspend {
             currentPomodoroRound.collect {
                 if (it == MAX_POMODORO_ROUND) {
-                    Timber.e("Done run sequential")
                     pomodoroRound = DEFAULT_POMODORO_ROUND
                     _currentPomodoroRound.value = pomodoroRound
                     setTimerIsRunning(false)
@@ -62,29 +59,29 @@ class BoxingViewModel @Inject constructor(
     val currentPomodoroRound: StateFlow<Int>
         get() = _currentPomodoroRound
 
-    val pausedTime: StateFlow<Long?>
-        get() = _pausedTime
+    val pausedTime: LiveData<Long?>
+        get() = _pausedTime.asLiveData()
 
-    val restTime: StateFlow<Int>
-        get() = _restTime
+    val restTime: LiveData<Int>
+        get() = _restTime.asLiveData()
 
-    val currentTime: StateFlow<Long?>
-        get() = _currentTime
+    val currentTime: LiveData<Long?>
+        get() = _currentTime.asLiveData()
 
-    val currentTimeInFloat: StateFlow<Float?>
-        get() = _currentTimeInFloat
+    val currentTimeInFloat: LiveData<Float?>
+        get() = _currentTimeInFloat.asLiveData()
 
-    val isTimerRunning: MutableLiveData<Boolean>
-        get() = _isTimerRunning
+    val isTimerRunning: LiveData<Boolean>
+        get() = _isTimerRunning.asLiveData()
 
-    val timerState: StateFlow<TimerState>
-        get() = _timerState
+    val timerState: LiveData<TimerState>
+        get() = _timerState.asLiveData()
 
     fun setTimerIsRunning(data: Boolean) {
         _isTimerRunning.value = data
     }
 
-    fun setPauseTime(data: Long) {
+    private fun setPauseTime(data: Long) {
         _pausedTime.value = data
     }
 
