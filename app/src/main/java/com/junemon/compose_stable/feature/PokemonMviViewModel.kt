@@ -15,6 +15,7 @@ import com.junemon.compose_stable.screen.HomeScreenState
 import com.junemon.compose_stable.screen.HomeScreenUiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -39,14 +40,14 @@ class PokemonMviViewModel @Inject constructor(
         get() = reducer.state
 
     fun loadData() {
-        viewModelScope.launch {
-            dataUseCase.getPokemon().onEach {
+        consumeSuspend {
+            dataUseCase.getPokemon().collect {
                 when (val data = it) {
                     is UiState.Content -> sendEvent(HomeScreenUiEvent.ShowData(data.data))
                     is UiState.Error -> sendEvent(HomeScreenUiEvent.FailedMessage(data.message))
                 }
 
-            }.launchIn(this)
+            }
         }
     }
 
