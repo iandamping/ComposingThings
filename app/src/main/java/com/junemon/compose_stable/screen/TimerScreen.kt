@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
@@ -139,12 +140,12 @@ fun RestTimeRadioButton(
     itemSelected: (Int) -> Unit
 ) {
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(item[0]) }
-    val state = rememberScrollState()
-    LaunchedEffect(Unit) { state.animateScrollTo(100) }
+//    val state = rememberScrollState()
+//    LaunchedEffect(Unit) { state.animateScrollTo(100) }
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
+        modifier = modifier.
+            fillMaxWidth()
             .padding(12.dp)
     ) {
         Text(
@@ -156,8 +157,7 @@ fun RestTimeRadioButton(
         Row(
             modifier = modifier
                 .fillMaxWidth()
-                .height(50.dp)
-                .horizontalScroll(state),
+                .height(50.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             item.forEach { text ->

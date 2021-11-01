@@ -42,7 +42,10 @@ class MainActivity : ComponentActivity() {
                         timerState = timerState
                     )
 
-                    Column(modifier = Modifier.fillMaxSize()) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.SpaceEvenly
+                    ) {
                         TimerScreen(
                             timerViewModel = boxingVm,
                             modifier = Modifier

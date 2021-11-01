@@ -147,4 +147,9 @@ class BoxingViewModel @Inject constructor(
         bellRinger.warningBellSound()
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        boxingTimer.stopTimer()
+    }
+
 }
