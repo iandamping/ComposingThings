@@ -3,6 +3,7 @@ package com.junemon.compose_stable
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
@@ -16,9 +17,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberImagePainter
 import com.junemon.compose_stable.ui.theme.ComposingThingsTheme
 
 class MainActivity : ComponentActivity() {
@@ -59,7 +62,10 @@ fun PhotographerCard() {
             shape = CircleShape,
             color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f)
         ) {
-
+            Image(
+                painter = painterResource(id = R.drawable.ic_face),
+                contentDescription = "Muka"
+            )
         }
 
 
@@ -93,7 +99,6 @@ fun IntrinsicPreview() {
         }
     }
 }
-
 
 
 @Preview(showBackground = true)
