@@ -16,6 +16,7 @@
 
 package com.junemon.compose_stable.todo
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -193,14 +195,6 @@ fun TodoItemInput(
                 onImeAction = submit
             )
 
-
-//            New code: Replace the call to TodoEditButton with the content of the slot
-//            TodoEditButton(
-//                onClick = submit,
-//                text = "add",
-//                modifier = Modifier.align(Alignment.CenterVertically),
-//                enabled = value.isNotBlank()
-//            )
 
             Spacer(modifier = Modifier.width(8.dp))
             Box(Modifier.align(Alignment.CenterVertically)) { buttonSlot() }
