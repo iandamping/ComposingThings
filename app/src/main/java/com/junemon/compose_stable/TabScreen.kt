@@ -3,6 +3,9 @@ package com.junemon.compose_stable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -45,7 +48,12 @@ fun TabScreen(modifier: Modifier = Modifier) {
             ) {
                 tabs.forEachIndexed { index, tabItem ->
                     LeadingIconTab(
-                        icon = {},
+                        icon = {
+                               when(index) {
+                                   0 -> Icon(imageVector = Icons.Default.Done, contentDescription = "tab1 image")
+                                   else -> Icon(imageVector = Icons.Default.Delete, contentDescription = "tab1 image")
+                               }
+                        },
                         selected = pagerState.currentPage == index,
                         onClick = {
                             scope.launch {
