@@ -30,4 +30,31 @@ class PokemonUseCaseImpl @Inject constructor(private val repository: PokemonRepo
         return repository.getDetailSpeciesPokemon(url = url)
     }
 
+    override fun getDetailPokemonCharacteristic(id: Int): Flow<UiState<String>> {
+        return repository.getDetailPokemonCharacteristic(id).map {
+            when (it) {
+                is DomainResult.Error -> UiState.Error(it.message)
+                is DomainResult.Content -> UiState.Content(it.data)
+            }
+        }
+    }
+
+    override fun getPokemonLocationAreas(id: Int): Flow<UiState<List<String>>> {
+        return repository.getPokemonLocationAreas(id).map {
+            when (it) {
+                is DomainResult.Error -> UiState.Error(it.message)
+                is DomainResult.Content -> UiState.Content(it.data)
+            }
+        }
+    }
+
+    override fun getPokemonById(id: Int): Flow<UiState<PokemonDetail>> {
+        return repository.getPokemonById(id).map {
+            when (it) {
+                is DomainResult.Error -> UiState.Error(it.message)
+                is DomainResult.Content -> UiState.Content(it.data)
+            }
+        }
+    }
+
 }

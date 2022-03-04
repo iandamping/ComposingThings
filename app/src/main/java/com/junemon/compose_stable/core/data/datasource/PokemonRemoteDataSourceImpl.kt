@@ -6,8 +6,8 @@ import com.junemon.compose_stable.core.data.datasource.remote.NetworkConstant.EM
 import com.junemon.compose_stable.core.data.datasource.response.PokemonDetailResponse
 import com.junemon.compose_stable.core.data.datasource.response.PokemonResultsResponse
 import com.junemon.compose_stable.core.data.datasource.response.PokemonSpeciesDetailResponse
-import com.junemon.compose_stable.core.data.model.DataSourceResult
 import com.junemon.compose_stable.core.data.model.ApiResult
+import com.junemon.compose_stable.core.data.model.DataSourceResult
 import javax.inject.Inject
 
 /**
@@ -30,6 +30,27 @@ class PokemonRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun getDetailPokemon(url: String): PokemonDetailResponse {
         return api.getPokemon(url)
+    }
+
+    override suspend fun getDetailPokemonCharacteristic(id: Int): DataSourceResult<String> {
+        return when (val response = oneShotCalls { api.getPokemonCharacteristic(id) }) {
+            is ApiResult.Error -> DataSourceResult.SourceError(response.exception)
+            is ApiResult.Success -> DataSourceResult.SourceValue(response.data.descriptions[7].description)
+        }
+    }
+
+    override suspend fun getPokemonLocationAreas(id: Int): DataSourceResult<List<String>> {
+        return when (val response = oneShotCalls { api.getPokemonLocationAreas(id) }) {
+            is ApiResult.Error -> DataSourceResult.SourceError(response.exception)
+            is ApiResult.Success -> DataSourceResult.SourceValue(response.data.map { it.area.name })
+        }
+    }
+
+    override suspend fun getPokemonById(id: Int): DataSourceResult<PokemonDetailResponse> {
+        return when (val response = oneShotCalls { api.getPokemonById(id) }) {
+            is ApiResult.Error -> DataSourceResult.SourceError(response.exception)
+            is ApiResult.Success -> DataSourceResult.SourceValue(response.data)
+        }
     }
 
     override suspend fun getDetailSpeciesPokemon(url: String): PokemonSpeciesDetailResponse {

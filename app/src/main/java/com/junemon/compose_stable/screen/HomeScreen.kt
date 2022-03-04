@@ -10,6 +10,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import com.junemon.compose_stable.feature.PokemonMviViewModel
+import com.junemon.compose_stable.navigation.ConstantNavigation
+import com.junemon.compose_stable.navigation.NavigationArgs
 import timber.log.Timber
 
 
@@ -21,6 +23,7 @@ import timber.log.Timber
 @Composable
 fun HomeScreen(
     pokemonMviVm: PokemonMviViewModel,
+    argument: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -29,13 +32,8 @@ fun HomeScreen(
     val mviFlowLifecycle = remember(pokemonMviVm.state, lifecycleOwner) {
         pokemonMviVm.state.flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
     }
-
-
     val state by mviFlowLifecycle.collectAsState(HomeScreenState.initial())
 
-    pokemonMviVm.loadData()
-
-//    val state by pokemonMviVm.state.collectAsState()
 
     when {
         state.isLoading -> pokemonMviVm.LottieLoading(loadingSize = 200.dp)
@@ -43,7 +41,9 @@ fun HomeScreen(
             listOfPokemon = state.data,
             modifier = modifier,
             selectPokemon = { selectedPokemon ->
-                Timber.e("select pokemon : ${selectedPokemon.pokemonImage}")
+                argument.invoke(
+                    selectedPokemon.pokemonId
+                )
             })
         state.failedMessage.isNotEmpty() -> {
             Timber.e("errorn : ${state.failedMessage}")

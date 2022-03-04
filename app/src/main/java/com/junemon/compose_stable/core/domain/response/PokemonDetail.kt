@@ -6,6 +6,7 @@ package com.junemon.compose_stable.core.domain.response
  * Indonesia.
  */
 data class PokemonDetail(
+    val pokemonId:Int,
     val pokemonName:String,
     val pokemonWeight:Int,
     val pokemonHeight:Int,

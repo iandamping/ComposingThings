@@ -15,17 +15,22 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
+import coil.imageLoader
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.airbnb.lottie.compose.*
 import com.junemon.compose_stable.R
 import com.junemon.compose_stable.core.domain.response.PokemonDetail
@@ -41,6 +46,20 @@ import javax.inject.Inject
  * Indonesia.
  */
 class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
+
+    @Composable
+    override fun provideCoilImageLoader() = LocalContext.current.imageLoader
+
+    @Composable
+    override fun provideCoilImageRequest(imageUrl: String): ImageRequest {
+        return ImageRequest.Builder(LocalContext.current)
+            .data(imageUrl)
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .addHeader("Cache-Control", "max-age=20,public")
+            .crossfade(true)
+            .build()
+    }
+
     @Composable
     override fun ListPokemon(
         listOfPokemon: List<PokemonDetail>,
@@ -138,13 +157,13 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
 
 
     @Composable
-    private fun PokemonItem(
+    override fun PokemonItem(
         singlePokemon: PokemonDetail,
         randomName: List<String>,
         pokemonSelect: (PokemonDetail) -> Unit,
         modifier: Modifier
     ) {
-        var isExpanded by remember {
+        var isExpanded by rememberSaveable {
             mutableStateOf(false)
         }
         val transition = updateTransition(targetState = isExpanded, label = "")
@@ -156,7 +175,6 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
             if (it) 90.dp else 100.dp
         }, label = "")
 
-        val listState = rememberScrollState()
 
         Card(
             elevation = Dp(4F),
@@ -164,19 +182,17 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
             modifier = modifier
                 .fillMaxSize()
                 .padding(8.dp)
-                .clickable {
-                    pokemonSelect(singlePokemon)
+                .clickable(enabled = isExpanded) {
+
                 }
         ) {
             if (isExpanded) {
                 Column(
                     modifier
                         .animateContentSize()
-                        .padding(Dp(8f))
-                        .verticalScroll(listState)
+                        .padding(8.dp)
                         .clickable {
-                            isExpanded = false
-//                            pokemonSelect(singlePokemon)
+                            pokemonSelect(singlePokemon)
                         }
                 ) {
                     Text(
@@ -190,9 +206,10 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                     )
 
                     Image(
-                        painter = rememberImagePainter(singlePokemon.pokemonImage, builder = {
-                            crossfade(true)
-                        }),
+                        painter = rememberImagePainter(
+                            request = provideCoilImageRequest(imageUrl = singlePokemon.pokemonImage),
+                            imageLoader = provideCoilImageLoader(),
+                        ),
                         modifier = modifier
                             .size(pokemonImageSizeDp)
                             .padding(8.dp),
@@ -208,15 +225,6 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                         contentScale = ContentScale.Crop
                     )
 
-                    ListOfPokemonSprite(
-                        pokemonItem = singlePokemon,
-                        modifier = modifier.fillMaxWidth()
-                    )
-
-                    Column(modifier = modifier.fillMaxWidth()) {
-                        PokemonDetailStat(pokemonItem = singlePokemon, modifier = modifier)
-                        PokemonDetailType(pokemonItem = singlePokemon, modifier = modifier)
-                    }
                 }
 
             } else {
@@ -235,9 +243,10 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                     )
 
                     Image(
-                        painter = rememberImagePainter(singlePokemon.pokemonImage, builder = {
-                            crossfade(true)
-                        }),
+                        painter = rememberImagePainter(
+                            request = provideCoilImageRequest(imageUrl = singlePokemon.pokemonImage),
+                            imageLoader = provideCoilImageLoader(),
+                        ),
                         modifier = modifier
                             .size(pokemonImageSizeDp)
                             .padding(8.dp),
@@ -256,7 +265,7 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                             elevation = ButtonDefaults.elevation(8.dp),
                             shape = MaterialTheme.shapes.medium,
                             onClick = {
-                                isExpanded = true
+                                isExpanded = !isExpanded
                             }) {
                             Text(text = randomName[0])
                         }
@@ -265,7 +274,7 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                             elevation = ButtonDefaults.elevation(8.dp),
                             shape = MaterialTheme.shapes.medium,
                             onClick = {
-                                isExpanded = true
+                                isExpanded = !isExpanded
                             }) {
                             Text(text = randomName[1])
                         }
@@ -274,7 +283,7 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                             elevation = ButtonDefaults.elevation(8.dp),
                             shape = MaterialTheme.shapes.medium,
                             onClick = {
-                                isExpanded = true
+                                isExpanded = !isExpanded
                             }) {
                             Text(text = randomName[2])
                         }
@@ -288,14 +297,72 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
     }
 
     @Composable
-    private fun ListOfPokemonSprite(pokemonItem: PokemonDetail, modifier: Modifier) {
+    override fun DetailPokemonItem(
+        singlePokemon: PokemonDetail,
+        pokemonSelect: (PokemonDetail) -> Unit,
+        modifier: Modifier
+    ) {
+        val scrollState = rememberScrollState()
+        Card(
+            elevation = Dp(4F),
+            shape = RoundedCornerShape(8.dp),
+            modifier = modifier
+                .fillMaxSize()
+                .padding(8.dp)
+                .verticalScroll(scrollState)
+        ) {
+
+            Column(
+                modifier
+                    .animateContentSize()
+                    .padding(8.dp)
+
+            ) {
+                Text(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .animateContentSize(),
+                    text = singlePokemon.pokemonName,
+                    style = MaterialTheme.typography.h4,
+                    textAlign = TextAlign.Center
+                )
+
+                Image(
+                    painter = rememberImagePainter(
+                        request = provideCoilImageRequest(imageUrl = singlePokemon.pokemonImage),
+                        imageLoader = provideCoilImageLoader(),
+                    ),
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .padding(8.dp),
+                    contentDescription = null
+                )
+
+                ListOfPokemonSprite(
+                    pokemonItem = singlePokemon,
+                    modifier = modifier.fillMaxWidth()
+                )
+
+                Column(modifier = modifier.fillMaxWidth()) {
+                    PokemonDetailStat(pokemonItem = singlePokemon, modifier = modifier)
+                    PokemonDetailType(pokemonItem = singlePokemon, modifier = modifier)
+                }
+            }
+
+        }
+
+    }
+
+    @Composable
+    override fun ListOfPokemonSprite(pokemonItem: PokemonDetail, modifier: Modifier) {
         Row(modifier = modifier) {
             Image(
                 painter = rememberImagePainter(
-                    pokemonItem.pokemonSmallImage1,
-                    builder = {
-                        crossfade(true)
-                    }),
+                    request = provideCoilImageRequest(imageUrl = pokemonItem.pokemonSmallImage1),
+                    imageLoader = provideCoilImageLoader(),
+                ),
                 modifier = modifier
                     .size(100.dp)
                     .weight(1f),
@@ -304,10 +371,9 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
 
             Image(
                 painter = rememberImagePainter(
-                    pokemonItem.pokemonSmallImage2,
-                    builder = {
-                        crossfade(true)
-                    }),
+                    request = provideCoilImageRequest(imageUrl = pokemonItem.pokemonSmallImage2),
+                    imageLoader = provideCoilImageLoader(),
+                ),
                 modifier = modifier
                     .size(100.dp)
                     .weight(1f),
@@ -316,10 +382,9 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
 
             Image(
                 painter = rememberImagePainter(
-                    pokemonItem.pokemonSmallImage3,
-                    builder = {
-                        crossfade(true)
-                    }),
+                    request = provideCoilImageRequest(imageUrl = pokemonItem.pokemonSmallImage3),
+                    imageLoader = provideCoilImageLoader(),
+                ),
                 modifier = modifier
                     .size(100.dp)
                     .weight(1f),
@@ -328,10 +393,9 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
 
             Image(
                 painter = rememberImagePainter(
-                    pokemonItem.pokemonSmallImage4,
-                    builder = {
-                        crossfade(true)
-                    }),
+                    request = provideCoilImageRequest(imageUrl = pokemonItem.pokemonSmallImage4),
+                    imageLoader = provideCoilImageLoader(),
+                ),
                 modifier = modifier
                     .size(100.dp)
                     .weight(1f),
@@ -341,112 +405,133 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
     }
 
     @Composable
-    private fun PokemonDetailStat(pokemonItem: PokemonDetail, modifier: Modifier) {
+    override fun DetailStatRow(firstText: String, secondText: String, modifier: Modifier) {
         Row {
             Text(
-                text = pokemonItem.pokemonStat0.name,
+                text = firstText,
                 modifier = modifier
                     .weight(1f)
                     .wrapContentWidth(Alignment.Start)
             )
             Text(
-                text = pokemonItem.pokemonStat0.point.toString(),
+                text = secondText,
                 modifier = modifier
                     .weight(1f)
                     .wrapContentWidth(Alignment.End)
             )
         }
-        Row {
-            Text(
-                text = pokemonItem.pokemonStat1.name,
-                modifier = modifier
-                    .weight(1f)
-                    .wrapContentWidth(Alignment.Start)
-            )
-            Text(
-                text = pokemonItem.pokemonStat1.point.toString(),
-                modifier = modifier
-                    .weight(1f)
-                    .wrapContentWidth(Alignment.End)
-            )
-        }
-        Row {
-            Text(
-                text = pokemonItem.pokemonStat2.name,
-                modifier = modifier
-                    .weight(1f)
-                    .wrapContentWidth(Alignment.Start)
-            )
-            Text(
-                text = pokemonItem.pokemonStat2.point.toString(),
-                modifier = modifier
-                    .weight(1f)
-                    .wrapContentWidth(Alignment.End)
-            )
-        }
-        Row {
-            Text(
-                text = pokemonItem.pokemonStat3.name,
-                modifier = modifier
-                    .weight(1f)
-                    .wrapContentWidth(Alignment.Start)
-            )
-            Text(
-                text = pokemonItem.pokemonStat3.point.toString(),
-                modifier = modifier
-                    .weight(1f)
-                    .wrapContentWidth(Alignment.End)
-            )
-        }
-        Row {
-            Text(
-                text = pokemonItem.pokemonStat4.name,
-                modifier = modifier
-                    .weight(1f)
-                    .wrapContentWidth(Alignment.Start)
-            )
-            Text(
-                text = pokemonItem.pokemonStat4.point.toString(),
-                modifier = modifier
-                    .weight(1f)
-                    .wrapContentWidth(Alignment.End)
-            )
-        }
+    }
 
-        Row {
-            Text(
-                text = pokemonItem.pokemonStat5.name,
-                modifier = modifier
-                    .weight(1f)
-                    .wrapContentWidth(Alignment.Start)
-            )
-            Text(
-                text = pokemonItem.pokemonStat5.point.toString(),
-                modifier = modifier
-                    .weight(1f)
-                    .wrapContentWidth(Alignment.End)
-            )
+    @Composable
+    override fun PokemonDetailStat(pokemonItem: PokemonDetail, modifier: Modifier) {
+        DetailStatRow(
+            firstText = pokemonItem.pokemonStat0.name,
+            secondText = pokemonItem.pokemonStat0.point.toString(),
+            modifier = modifier
+        )
+        DetailStatRow(
+            firstText = pokemonItem.pokemonStat1.name,
+            secondText = pokemonItem.pokemonStat1.point.toString(),
+            modifier = modifier
+        )
+        DetailStatRow(
+            firstText = pokemonItem.pokemonStat2.name,
+            secondText = pokemonItem.pokemonStat2.point.toString(),
+            modifier = modifier
+        )
+        DetailStatRow(
+            firstText = pokemonItem.pokemonStat3.name,
+            secondText = pokemonItem.pokemonStat3.point.toString(),
+            modifier = modifier
+        )
+        DetailStatRow(
+            firstText = pokemonItem.pokemonStat4.name,
+            secondText = pokemonItem.pokemonStat4.point.toString(),
+            modifier = modifier
+        )
+        DetailStatRow(
+            firstText = pokemonItem.pokemonStat5.name,
+            secondText = pokemonItem.pokemonStat5.point.toString(),
+            modifier = modifier
+        )
+    }
+
+    @Composable
+    override fun DetailAreaRow(modifier: Modifier, areas: List<String>) {
+        if (areas.size < 2){
+           Row {
+               Text(
+                   text = "Area :",
+                   modifier = modifier
+                       .weight(1f)
+                       .wrapContentWidth(Alignment.Start)
+               )
+               Text(
+                   text = areas[0], modifier = modifier
+                       .weight(1f)
+                       .wrapContentWidth(Alignment.End)
+               )
+           }
+        }else{
+            areas.forEachIndexed { index, s ->
+                Row {
+                    Text(
+                        text = if (index == 0) "Area : " else "",
+                        modifier = modifier
+                            .weight(1f)
+                            .wrapContentWidth(Alignment.Start)
+                    )
+
+                    Text(
+                        text = s, modifier = modifier
+                            .weight(1f)
+                            .wrapContentWidth(Alignment.End)
+                    )
+                }
+            }
         }
 
 
     }
 
     @Composable
-    private fun PokemonDetailType(pokemonItem: PokemonDetail, modifier: Modifier) {
+    override fun DetailCharacteristicRow(modifier: Modifier, characteristic: String) {
         Row {
             Text(
-                text = "Type :",
+                text = "Characteristic",
                 modifier = modifier
                     .weight(1f)
                     .wrapContentWidth(Alignment.Start)
             )
             Text(
-                text = pokemonItem.pokemonType0, modifier = modifier
+                text = characteristic, modifier = modifier
                     .weight(1f)
                     .wrapContentWidth(Alignment.End)
             )
         }
-        if (pokemonItem.pokemonType1 != ONE_TYPE_MONS) {
+    }
+
+    @Composable
+    override fun DetailTypeRow(
+        firstText: String,
+        secondText: String,
+        thirdText: String,
+        modifier: Modifier
+    ) {
+        Row {
+            Text(
+                text = firstText,
+                modifier = modifier
+                    .weight(1f)
+                    .wrapContentWidth(Alignment.Start)
+            )
+            Text(
+                text = secondText, modifier = modifier
+                    .weight(1f)
+                    .wrapContentWidth(Alignment.End)
+            )
+        }
+        if (thirdText != ONE_TYPE_MONS && thirdText != ONE_SKILL_MONS) {
             Row {
                 Text(
                     text = "",
@@ -455,44 +540,30 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                         .wrapContentWidth(Alignment.Start)
                 )
                 Text(
-                    text = pokemonItem.pokemonType1,
-                    modifier = modifier
+                    text = thirdText, modifier = modifier
                         .weight(1f)
                         .wrapContentWidth(Alignment.End)
                 )
             }
         }
 
-        Row {
-            Text(
-                text = "Ability :",
-                modifier = modifier
-                    .weight(1f)
-                    .wrapContentWidth(Alignment.Start)
-            )
-            Text(
-                text = pokemonItem.pokemonAbility1,
-                modifier = modifier
-                    .weight(1f)
-                    .wrapContentWidth(Alignment.End)
-            )
-        }
-        if (pokemonItem.pokemonAbility2 != ONE_SKILL_MONS) {
-            Row {
-                Text(
-                    text = "",
-                    modifier = modifier
-                        .weight(1f)
-                        .wrapContentWidth(Alignment.Start)
-                )
-                Text(
-                    text = pokemonItem.pokemonAbility2,
-                    modifier = modifier
-                        .weight(1f)
-                        .wrapContentWidth(Alignment.End)
-                )
-            }
-        }
+    }
+
+    @Composable
+    override fun PokemonDetailType(pokemonItem: PokemonDetail, modifier: Modifier) {
+        DetailTypeRow(
+            firstText = "Type :",
+            secondText = pokemonItem.pokemonType0,
+            thirdText = pokemonItem.pokemonType1,
+            modifier = modifier
+        )
+
+        DetailTypeRow(
+            firstText = "Ability :",
+            secondText = pokemonItem.pokemonAbility1,
+            thirdText = pokemonItem.pokemonAbility2,
+            modifier = modifier
+        )
 
     }
 }

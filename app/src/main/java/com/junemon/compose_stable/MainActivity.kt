@@ -12,18 +12,22 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.compose.rememberNavController
 import com.junemon.compose_stable.core.presentation.ComposingWithTheme
+import com.junemon.compose_stable.feature.PokemonDetailMviViewModel
 import com.junemon.compose_stable.feature.PokemonMviViewModel
-import com.junemon.compose_stable.screen.HomeScreen
+import com.junemon.compose_stable.navigation.ScreenNavigation
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val pokemonVmMvi: PokemonMviViewModel by viewModels()
+    private val pokemonDetailVmMvi: PokemonDetailMviViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val controller = rememberNavController()
+
             ComposingWithTheme {
                 Box(modifier = Modifier.fillMaxSize()) {
                     Image(
@@ -33,7 +37,11 @@ class MainActivity : ComponentActivity() {
                             .fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
-                    HomeScreen(pokemonMviVm = pokemonVmMvi)
+                    ScreenNavigation(
+                        pokemonMviVm = pokemonVmMvi,
+                        detailPokemonVm = pokemonDetailVmMvi,
+                        navController = controller,
+                    )
                 }
 
             }

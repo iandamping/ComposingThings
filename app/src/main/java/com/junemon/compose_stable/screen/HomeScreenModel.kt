@@ -13,18 +13,11 @@ import javax.annotation.concurrent.Immutable
  */
 
 @Immutable
-sealed class HomeScreenUiEvent : MviUiEvent {
-    data class ShowData(val items: List<PokemonDetail>) : HomeScreenUiEvent()
-    data class FailedMessage(val message: String) : HomeScreenUiEvent()
-}
-
-
-@Immutable
 data class HomeScreenState(
     val isLoading: Boolean,
     val failedMessage: String,
     val data: List<PokemonDetail>,
-) : MviUiState {
+) {
 
     companion object {
         fun initial() = HomeScreenState(

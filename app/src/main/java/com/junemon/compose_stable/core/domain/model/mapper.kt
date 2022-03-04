@@ -15,6 +15,7 @@ import java.util.*
  * Indonesia.
  */
 fun PokemonDetailResponse.mapToDetail(): PokemonDetail = PokemonDetail(
+    pokemonId = pokemonId,
     pokemonWeight = pokemonWeight,
     pokemonHeight = pokemonHeight,
     pokemonName = pokemonName.replaceFirstChar {
