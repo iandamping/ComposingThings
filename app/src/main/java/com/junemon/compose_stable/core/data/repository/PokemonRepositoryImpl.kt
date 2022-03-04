@@ -81,12 +81,6 @@ class PokemonRepositoryImpl @Inject constructor(
 
     override fun getPokemonById(id: Int): Flow<DomainResult<PokemonDetail>> {
         return flow {
-            remoteDataSource.getDetailPokemonCharacteristic(id)
-            remoteDataSource.getPokemonLocationAreas(id)
-            remoteDataSource.getPokemonById(id)
-
-
-
             when (val result = remoteDataSource.getPokemonById(id)) {
                 is DataSourceResult.SourceValue -> {
                     emit(DomainResult.Content(result.data.mapToDetail()))
