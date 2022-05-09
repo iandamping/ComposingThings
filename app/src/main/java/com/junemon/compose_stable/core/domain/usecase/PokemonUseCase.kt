@@ -15,13 +15,13 @@ import kotlinx.coroutines.flow.Flow
  */
 interface PokemonUseCase {
 
-    fun getPokemon(): Flow<UiState<List<PokemonDetail>>>
+    suspend fun getPokemon(): UiState<List<PokemonDetail>>
 
-    fun getDetailSpeciesPokemon(url: String): Flow<PokemonDetailSpecies>
+    suspend fun getDetailSpeciesPokemon(url: String): UiState<PokemonDetailSpecies>
 
-    fun getDetailPokemonCharacteristic(id: Int): Flow<UiState<String>>
+    suspend fun getDetailPokemonCharacteristic(id: Int): UiState<String>
 
-    fun getPokemonLocationAreas(id: Int): Flow<UiState<List<String>>>
+    suspend fun getPokemonLocationAreas(id: Int): UiState<List<String>>
 
-    fun getPokemonById(id: Int): Flow<UiState<PokemonDetail>>
+    suspend fun getPokemonById(id: Int): UiState<PokemonDetail>
 }

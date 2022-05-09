@@ -42,24 +42,16 @@ class PokemonDetailMviViewModel @Inject constructor(
 
 
     fun setSelectedPokemonId(id: Int) {
-
         _selectedPokemonId.value = id
     }
 
     init {
         viewModelScope.launch {
-            selectedPokemonId.flatMapLatest {
-                combine(
-                    dataUseCase.getPokemonLocationAreas(it),
-                    dataUseCase.getDetailPokemonCharacteristic(it),
-                    dataUseCase.getPokemonById(it)
-                ) { a, b, c ->
-                    Triple(a, b, c)
-                }
-            }.collect {
-                consumePokemonAreaById(it.first)
-                consumeDetailPokemonCharacteristicById(it.second)
-                consumePokemonDetailById(it.third)
+            selectedPokemonId.collect {
+                consumePokemonAreaById(dataUseCase.getPokemonLocationAreas(it))
+                consumeDetailPokemonCharacteristicById(dataUseCase.getDetailPokemonCharacteristic(it))
+                consumePokemonDetailById(dataUseCase.getPokemonById(it))
+
             }
         }
     }

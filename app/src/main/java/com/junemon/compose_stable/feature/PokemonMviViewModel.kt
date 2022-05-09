@@ -14,7 +14,6 @@ import com.junemon.compose_stable.core.presentation.model.UiState
 import com.junemon.compose_stable.core.presentation.screens.ScreensUseCase
 import com.junemon.compose_stable.screen.HomeScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -36,16 +35,12 @@ class PokemonMviViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            dataUseCase.getPokemon().collect {
-                uiState = when (val data = it) {
-                    is UiState.Content ->
-                        uiState.copy(isLoading = false, data = data.data)
+            uiState = when (val data = dataUseCase.getPokemon()) {
+                is UiState.Content ->
+                    uiState.copy(isLoading = false, data = data.data)
 
-                    is UiState.Error ->
-                        uiState.copy(isLoading = false, failedMessage = data.message)
-
-                }
-
+                is UiState.Error ->
+                    uiState.copy(isLoading = false, failedMessage = data.message)
             }
         }
     }

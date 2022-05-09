@@ -53,7 +53,10 @@ class PokemonRemoteDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun getDetailSpeciesPokemon(url: String): PokemonSpeciesDetailResponse {
-        return api.getPokemonSpecies(url)
+    override suspend fun getDetailSpeciesPokemon(url: String): DataSourceResult<PokemonSpeciesDetailResponse> {
+        return when (val response = oneShotCalls { api.getPokemonSpecies(url) }) {
+            is ApiResult.Error -> DataSourceResult.SourceError(response.exception)
+            is ApiResult.Success -> DataSourceResult.SourceValue(response.data)
+        }
     }
 }
