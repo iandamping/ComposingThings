@@ -27,7 +27,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.AsyncImage
 import coil.imageLoader
 import coil.request.CachePolicy
 import coil.request.ImageRequest
@@ -204,17 +204,16 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                         style = MaterialTheme.typography.h4,
                         textAlign = TextAlign.Center
                     )
-
-                    Image(
-                        painter = rememberImagePainter(
-                            request = provideCoilImageRequest(imageUrl = singlePokemon.pokemonImage),
-                            imageLoader = provideCoilImageLoader(),
-                        ),
+                    AsyncImage(
+                        model =
+                        provideCoilImageRequest(imageUrl = singlePokemon.pokemonImage),
+                        imageLoader = provideCoilImageLoader(),
+                        contentDescription = null,
                         modifier = modifier
                             .size(pokemonImageSizeDp)
-                            .padding(8.dp),
-                        contentDescription = null
+                            .padding(8.dp)
                     )
+
 
                     Image(
                         painter = painterResource(R.drawable.pokemon_logo),
@@ -241,19 +240,15 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                             .fillMaxWidth(),
                         contentScale = ContentScale.Crop
                     )
-
-                    Image(
-                        painter = rememberImagePainter(
-                            request = provideCoilImageRequest(imageUrl = singlePokemon.pokemonImage),
-                            imageLoader = provideCoilImageLoader(),
-                        ),
+                    AsyncImage(
+                        model = provideCoilImageRequest(imageUrl = singlePokemon.pokemonImage),
+                        contentDescription = null,
+                        imageLoader = provideCoilImageLoader(),
+                        colorFilter = ColorFilter.tint(Color.Gray),
                         modifier = modifier
                             .size(pokemonImageSizeDp)
-                            .padding(8.dp),
-                        colorFilter = ColorFilter.tint(Color.Gray),
-                        contentDescription = null
+                            .padding(8.dp)
                     )
-
                     Column(
                         modifier = modifier
                             .fillMaxHeight()
@@ -327,18 +322,15 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                     style = MaterialTheme.typography.h4,
                     textAlign = TextAlign.Center
                 )
-
-                Image(
-                    painter = rememberImagePainter(
-                        request = provideCoilImageRequest(imageUrl = singlePokemon.pokemonImage),
-                        imageLoader = provideCoilImageLoader(),
-                    ),
+                AsyncImage(
+                    model = provideCoilImageRequest(imageUrl = singlePokemon.pokemonImage),
+                    imageLoader = provideCoilImageLoader(),
                     modifier = modifier
                         .fillMaxWidth()
                         .height(200.dp)
-                        .padding(8.dp),
-                    contentDescription = null
+                        .padding(8.dp), contentDescription = null
                 )
+
 
                 ListOfPokemonSprite(
                     pokemonItem = singlePokemon,
@@ -358,49 +350,29 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
     @Composable
     override fun ListOfPokemonSprite(pokemonItem: PokemonDetail, modifier: Modifier) {
         Row(modifier = modifier) {
-            Image(
-                painter = rememberImagePainter(
-                    request = provideCoilImageRequest(imageUrl = pokemonItem.pokemonSmallImage1),
-                    imageLoader = provideCoilImageLoader(),
-                ),
+            AsyncImage(
+                model = provideCoilImageRequest(imageUrl = pokemonItem.pokemonSmallImage1),
+                imageLoader = provideCoilImageLoader(),
                 modifier = modifier
                     .size(100.dp)
                     .weight(1f),
                 contentDescription = null
             )
 
-            Image(
-                painter = rememberImagePainter(
-                    request = provideCoilImageRequest(imageUrl = pokemonItem.pokemonSmallImage2),
-                    imageLoader = provideCoilImageLoader(),
-                ),
+            AsyncImage(
+                model = provideCoilImageRequest(imageUrl = pokemonItem.pokemonSmallImage3), contentDescription = null,
+                imageLoader = provideCoilImageLoader(),
                 modifier = modifier
                     .size(100.dp)
-                    .weight(1f),
-                contentDescription = null
+                    .weight(1f)
             )
 
-            Image(
-                painter = rememberImagePainter(
-                    request = provideCoilImageRequest(imageUrl = pokemonItem.pokemonSmallImage3),
-                    imageLoader = provideCoilImageLoader(),
-                ),
+            AsyncImage(model = provideCoilImageRequest(imageUrl = pokemonItem.pokemonSmallImage4)
+                , imageLoader = provideCoilImageLoader(),
                 modifier = modifier
                     .size(100.dp)
                     .weight(1f),
-                contentDescription = null
-            )
-
-            Image(
-                painter = rememberImagePainter(
-                    request = provideCoilImageRequest(imageUrl = pokemonItem.pokemonSmallImage4),
-                    imageLoader = provideCoilImageLoader(),
-                ),
-                modifier = modifier
-                    .size(100.dp)
-                    .weight(1f),
-                contentDescription = null
-            )
+                contentDescription = null)
         }
     }
 
@@ -458,21 +430,21 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
 
     @Composable
     override fun DetailAreaRow(modifier: Modifier, areas: List<String>) {
-        if (areas.size < 2){
-           Row {
-               Text(
-                   text = "Area :",
-                   modifier = modifier
-                       .weight(1f)
-                       .wrapContentWidth(Alignment.Start)
-               )
-               Text(
-                   text = areas[0], modifier = modifier
-                       .weight(1f)
-                       .wrapContentWidth(Alignment.End)
-               )
-           }
-        }else{
+        if (areas.size < 2) {
+            Row {
+                Text(
+                    text = "Area :",
+                    modifier = modifier
+                        .weight(1f)
+                        .wrapContentWidth(Alignment.Start)
+                )
+                Text(
+                    text = areas[0], modifier = modifier
+                        .weight(1f)
+                        .wrapContentWidth(Alignment.End)
+                )
+            }
+        } else {
             areas.forEachIndexed { index, s ->
                 Row {
                     Text(

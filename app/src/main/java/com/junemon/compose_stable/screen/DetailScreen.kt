@@ -1,7 +1,6 @@
 package com.junemon.compose_stable.screen
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.AsyncImage
 import com.junemon.compose_stable.feature.PokemonDetailMviViewModel
 import timber.log.Timber
 
@@ -46,48 +45,44 @@ fun DetailScreen(
 
         ) {
             when {
-                stat.isLoading -> {
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        pokemonDetailVM.LottieLoading(loadingSize = 50.dp)
-                    }
+                stat.isLoading -> Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    pokemonDetailVM.LottieLoading(loadingSize = 50.dp)
                 }
+
                 stat.data != null -> {
                     Text(
                         modifier = modifier
                             .fillMaxWidth()
                             .padding(8.dp)
                             .animateContentSize(),
-                        text = stat.data!!.pokemonName,
+                        text = stat.data.pokemonName,
                         style = MaterialTheme.typography.h4,
                         textAlign = TextAlign.Center
                     )
 
-                    Image(
-                        painter = rememberImagePainter(
-                            request = pokemonDetailVM.provideCoilImageRequest(imageUrl = stat.data!!.pokemonImage),
-                            imageLoader = pokemonDetailVM.provideCoilImageLoader(),
-                        ),
+                    AsyncImage(
+                        model = pokemonDetailVM.provideCoilImageRequest(imageUrl = stat.data.pokemonImage),
                         modifier = modifier
                             .fillMaxWidth()
                             .height(200.dp)
-                            .padding(8.dp),
-                        contentDescription = null
+                            .padding(8.dp), contentDescription = null
                     )
 
+
                     pokemonDetailVM.ListOfPokemonSprite(
-                        pokemonItem = stat.data!!
+                        pokemonItem = stat.data
                     )
 
                     Column(modifier = modifier.fillMaxWidth()) {
                         pokemonDetailVM.PokemonDetailStat(
-                            pokemonItem = stat.data!!
+                            pokemonItem = stat.data
                         )
                         pokemonDetailVM.PokemonDetailType(
-                            pokemonItem = stat.data!!
+                            pokemonItem = stat.data
                         )
                     }
                 }
@@ -122,6 +117,7 @@ fun DetailScreen(
                 ) {
                     pokemonDetailVM.LottieLoading(loadingSize = 50.dp)
                 }
+
                 characteristic.data.isNotEmpty() -> {
                     pokemonDetailVM.DetailCharacteristicRow(characteristic = characteristic.data)
 

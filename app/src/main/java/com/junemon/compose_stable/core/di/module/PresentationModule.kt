@@ -18,7 +18,6 @@ import javax.inject.Singleton
 interface PresentationModule {
 
     @Binds
-    @Singleton
     fun bindsScreenUseCase(useCase: ScreensUseCaseImpl): ScreensUseCase
 
 }
