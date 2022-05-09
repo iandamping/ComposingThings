@@ -27,13 +27,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
 
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    val mviFlowLifecycle = remember(pokemonMviVm.state, lifecycleOwner) {
-        pokemonMviVm.state.flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-    }
-    val state by mviFlowLifecycle.collectAsState(HomeScreenState.initial())
-
+    val state = pokemonMviVm.uiState
 
     when {
         state.isLoading -> pokemonMviVm.LottieLoading(loadingSize = 200.dp)

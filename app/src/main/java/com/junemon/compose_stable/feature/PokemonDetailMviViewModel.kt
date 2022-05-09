@@ -1,6 +1,9 @@
 package com.junemon.compose_stable.feature
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.ViewModel
@@ -25,29 +28,21 @@ class PokemonDetailMviViewModel @Inject constructor(
     private val screenUseCase: ScreensUseCase
 ) : ViewModel() {
 
+    var uiAreaState by mutableStateOf(DetailScreenAreaState.initial())
+        private set
+
+    var uiCharacteristicState by mutableStateOf(DetailScreenCharacteristicState.initial())
+        private set
+
+    var uiStatState by mutableStateOf(DetailPokemonStatState.initial())
+        private set
 
     private val _selectedPokemonId = MutableStateFlow(0)
     val selectedPokemonId = _selectedPokemonId.asStateFlow()
 
 
-    private val _areaState: MutableStateFlow<DetailScreenAreaState> = MutableStateFlow(
-        DetailScreenAreaState.initial()
-    )
-    val areaState = _areaState.asStateFlow()
-
-    private val _characteristicState: MutableStateFlow<DetailScreenCharacteristicState> =
-        MutableStateFlow(
-            DetailScreenCharacteristicState.initial()
-        )
-    val characteristicState = _characteristicState.asStateFlow()
-
-    private val _statState: MutableStateFlow<DetailPokemonStatState> =
-        MutableStateFlow(
-            DetailPokemonStatState.initial()
-        )
-    val statState = _statState.asStateFlow()
-
     fun setSelectedPokemonId(id: Int) {
+
         _selectedPokemonId.value = id
     }
 
@@ -71,41 +66,31 @@ class PokemonDetailMviViewModel @Inject constructor(
 
 
     private fun consumePokemonAreaById(data: UiState<List<String>>) {
-        when (data) {
+        uiAreaState = when (data) {
             is UiState.Content ->
-                _areaState.update { currentUiState ->
-                    currentUiState.copy(isLoading = false, data = data.data)
-                }
+                uiAreaState.copy(isLoading = false, data = data.data)
             is UiState.Error ->
-                _areaState.update { currentUiState ->
-                    currentUiState.copy(isLoading = false, failedMessage = data.message)
-                }
+                uiAreaState.copy(isLoading = false, failedMessage = data.message)
         }
     }
 
     private fun consumeDetailPokemonCharacteristicById(data: UiState<String>) {
-        when (data) {
+        uiCharacteristicState = when (data) {
             is UiState.Content ->
-                _characteristicState.update { currentUiState ->
-                    currentUiState.copy(isLoading = false, data = data.data)
-                }
+                uiCharacteristicState.copy(isLoading = false, data = data.data)
+
             is UiState.Error ->
-                _characteristicState.update { currentUiState ->
-                    currentUiState.copy(isLoading = false, failedMessage = data.message)
-                }
+                uiCharacteristicState.copy(isLoading = false, failedMessage = data.message)
         }
     }
 
     private fun consumePokemonDetailById(data: UiState<PokemonDetail>) {
-        when (data) {
+        uiStatState = when (data) {
             is UiState.Content ->
-                _statState.update { currentUiState ->
-                    currentUiState.copy(isLoading = false, data = data.data)
-                }
+                uiStatState.copy(isLoading = false, data = data.data)
             is UiState.Error ->
-                _statState.update { currentUiState ->
-                    currentUiState.copy(isLoading = false, failedMessage = data.message)
-                }
+                uiStatState.copy(isLoading = false, failedMessage = data.message)
+
         }
     }
 

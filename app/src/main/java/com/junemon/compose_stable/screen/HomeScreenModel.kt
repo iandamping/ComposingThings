@@ -1,7 +1,5 @@
 package com.junemon.compose_stable.screen
 
-import com.junemon.compose_stable.base.MviUiEvent
-import com.junemon.compose_stable.base.MviUiState
 import com.junemon.compose_stable.core.domain.response.PokemonDetail
 import javax.annotation.concurrent.Immutable
 

@@ -10,17 +10,11 @@ import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
 import coil.compose.rememberImagePainter
 import com.junemon.compose_stable.feature.PokemonDetailMviViewModel
 import timber.log.Timber
@@ -31,33 +25,9 @@ fun DetailScreen(
     modifier: Modifier = Modifier
 ) {
 
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    val pokemonStatFlowLifecycle = remember(pokemonDetailVM.statState, lifecycleOwner) {
-        pokemonDetailVM.statState.flowWithLifecycle(
-            lifecycleOwner.lifecycle,
-            Lifecycle.State.STARTED
-        )
-    }
-
-    val pokemonAreaFlowLifecycle = remember(pokemonDetailVM.areaState, lifecycleOwner) {
-        pokemonDetailVM.areaState.flowWithLifecycle(
-            lifecycleOwner.lifecycle,
-            Lifecycle.State.STARTED
-        )
-    }
-    val pokemonCharacteristicFlowLifecycle =
-        remember(pokemonDetailVM.characteristicState, lifecycleOwner) {
-            pokemonDetailVM.characteristicState.flowWithLifecycle(
-                lifecycleOwner.lifecycle,
-                Lifecycle.State.STARTED
-            )
-        }
-    val stat by pokemonStatFlowLifecycle.collectAsState(DetailPokemonStatState.initial())
-    val area by pokemonAreaFlowLifecycle.collectAsState(DetailScreenAreaState.initial())
-    val characteristic by pokemonCharacteristicFlowLifecycle.collectAsState(
-        DetailScreenCharacteristicState.initial()
-    )
+    val stat = pokemonDetailVM.uiStatState
+    val area = pokemonDetailVM.uiAreaState
+    val characteristic = pokemonDetailVM.uiCharacteristicState
 
     val scrollState = rememberScrollState()
     Card(
@@ -153,7 +123,7 @@ fun DetailScreen(
                     pokemonDetailVM.LottieLoading(loadingSize = 50.dp)
                 }
                 characteristic.data.isNotEmpty() -> {
-                   pokemonDetailVM.DetailCharacteristicRow(characteristic = characteristic.data)
+                    pokemonDetailVM.DetailCharacteristicRow(characteristic = characteristic.data)
 
                 }
 
