@@ -51,8 +51,8 @@ class PokemonRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getCachedPokemon(): Flow<DomainResult<List<PokemonEntity>>> {
-        return cacheDataSource.loadPokemon().map { cacheValue ->
+    override val getCachedPokemon: Flow<DomainResult<List<PokemonEntity>>>
+        get() = cacheDataSource.loadPokemon().map { cacheValue ->
             if (cacheValue.isEmpty()) {
                 when (val result = remoteDataSource.getPokemon()) {
                     is DataSourceResult.SourceValue -> {
@@ -95,7 +95,6 @@ class PokemonRepositoryImpl @Inject constructor(
                 } else DomainResult.Content(cacheValue)
             }
         }
-    }
 
 
     override suspend fun getDetailSpeciesPokemon(url: String): DomainResult<PokemonDetailSpecies> {

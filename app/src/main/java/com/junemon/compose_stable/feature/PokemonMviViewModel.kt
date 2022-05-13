@@ -35,7 +35,7 @@ class PokemonMviViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            dataUseCase.getCachedPokemon().collect {
+            dataUseCase.getCachedPokemon.collect {
                 uiStateCached = when (it) {
                     is UiState.Content ->
                         uiStateCached.copy(isLoading = false, data = it.data)

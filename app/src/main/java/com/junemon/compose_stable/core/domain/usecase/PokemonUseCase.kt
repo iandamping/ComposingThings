@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.Flow
  */
 interface PokemonUseCase {
 
-    fun getCachedPokemon(): Flow<UiState<List<PokemonEntity>>>
+    val getCachedPokemon: Flow<UiState<List<PokemonEntity>>>
 
     suspend fun getRemotePokemon(): UiState<List<PokemonDetail>>
 

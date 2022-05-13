@@ -17,14 +17,15 @@ import javax.inject.Inject
  */
 class PokemonUseCaseImpl @Inject constructor(private val repository: PokemonRepository) :
     PokemonUseCase {
-    override fun getCachedPokemon(): Flow<UiState<List<PokemonEntity>>> {
-        return repository.getCachedPokemon().map {
-            when(it){
-                is DomainResult.Error -> UiState.Error(it.message)
-                is DomainResult.Content -> UiState.Content(it.data)
+    override val getCachedPokemon: Flow<UiState<List<PokemonEntity>>>
+        get() =
+            repository.getCachedPokemon.map {
+                when (it) {
+                    is DomainResult.Error -> UiState.Error(it.message)
+                    is DomainResult.Content -> UiState.Content(it.data)
+                }
             }
-        }
-    }
+
 
     override suspend fun getRemotePokemon(): UiState<List<PokemonDetail>> {
         return when (val it = repository.getRemotePokemon()) {

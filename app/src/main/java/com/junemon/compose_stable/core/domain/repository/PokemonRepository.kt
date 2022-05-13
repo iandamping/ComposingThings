@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
  */
 interface PokemonRepository {
 
-    fun getCachedPokemon(): Flow<DomainResult<List<PokemonEntity>>>
+    val getCachedPokemon: Flow<DomainResult<List<PokemonEntity>>>
 
     suspend fun getRemotePokemon(): DomainResult<List<PokemonDetail>>
 
