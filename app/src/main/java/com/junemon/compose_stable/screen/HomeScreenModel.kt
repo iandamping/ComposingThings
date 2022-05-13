@@ -1,5 +1,6 @@
 package com.junemon.compose_stable.screen
 
+import com.junemon.compose_stable.core.data.datasource.cache.PokemonEntity
 import com.junemon.compose_stable.core.domain.response.PokemonDetail
 import javax.annotation.concurrent.Immutable
 
@@ -9,16 +10,15 @@ import javax.annotation.concurrent.Immutable
  * Github https://github.com/iandamping
  * Indonesia.
  */
-
 @Immutable
-data class HomeScreenState(
+data class HomeScreenCachedState(
     val isLoading: Boolean,
     val failedMessage: String,
-    val data: List<PokemonDetail>,
+    val data: List<PokemonEntity>,
 ) {
 
     companion object {
-        fun initial() = HomeScreenState(
+        fun initial() = HomeScreenCachedState(
             isLoading = true,
             failedMessage = "",
             data = emptyList()

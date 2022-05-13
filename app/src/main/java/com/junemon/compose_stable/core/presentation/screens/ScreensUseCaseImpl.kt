@@ -33,6 +33,7 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.airbnb.lottie.compose.*
 import com.junemon.compose_stable.R
+import com.junemon.compose_stable.core.data.datasource.cache.PokemonEntity
 import com.junemon.compose_stable.core.domain.response.PokemonDetail
 import com.junemon.compose_stable.core.presentation.ComposePagerSnapHelper
 import com.junemon.compose_stable.util.PokemonConstant
@@ -62,8 +63,8 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
 
     @Composable
     override fun ListPokemon(
-        listOfPokemon: List<PokemonDetail>,
-        selectPokemon: (PokemonDetail) -> Unit,
+        listOfPokemon: List<PokemonEntity>,
+        selectPokemon: (PokemonEntity) -> Unit,
         modifier: Modifier
     ) {
         ComposePagerSnapHelper(
@@ -158,9 +159,9 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
 
     @Composable
     override fun PokemonItem(
-        singlePokemon: PokemonDetail,
+        singlePokemon: PokemonEntity,
         randomName: List<String>,
-        pokemonSelect: (PokemonDetail) -> Unit,
+        pokemonSelect: (PokemonEntity) -> Unit,
         modifier: Modifier
     ) {
         var isExpanded by rememberSaveable {

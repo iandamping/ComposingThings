@@ -1,7 +1,6 @@
 package com.junemon.compose_stable.core.domain.usecase
 
-import com.junemon.compose_stable.core.data.datasource.response.PokemonAreasResponse
-import com.junemon.compose_stable.core.data.datasource.response.PokemonCharacteristicResponse
+import com.junemon.compose_stable.core.data.datasource.cache.PokemonEntity
 import com.junemon.compose_stable.core.domain.model.DomainResult
 import com.junemon.compose_stable.core.domain.response.PokemonDetail
 import com.junemon.compose_stable.core.domain.response.PokemonDetailSpecies
@@ -15,7 +14,9 @@ import kotlinx.coroutines.flow.Flow
  */
 interface PokemonUseCase {
 
-    suspend fun getPokemon(): UiState<List<PokemonDetail>>
+    fun getCachedPokemon(): Flow<UiState<List<PokemonEntity>>>
+
+    suspend fun getRemotePokemon(): UiState<List<PokemonDetail>>
 
     suspend fun getDetailSpeciesPokemon(url: String): UiState<PokemonDetailSpecies>
 

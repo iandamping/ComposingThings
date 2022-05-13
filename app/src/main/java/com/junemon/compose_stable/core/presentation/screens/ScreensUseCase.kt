@@ -7,6 +7,7 @@ import androidx.compose.ui.unit.Dp
 import coil.ImageLoader
 import coil.annotation.ExperimentalCoilApi
 import coil.request.ImageRequest
+import com.junemon.compose_stable.core.data.datasource.cache.PokemonEntity
 import com.junemon.compose_stable.core.domain.response.PokemonDetail
 
 /**
@@ -23,13 +24,13 @@ interface ScreensUseCase {
     fun provideCoilImageRequest(imageUrl: String): ImageRequest
 
     @Composable
-    fun ListPokemon(listOfPokemon: List<PokemonDetail>, selectPokemon: (PokemonDetail) -> Unit, modifier: Modifier)
+    fun ListPokemon(listOfPokemon: List<PokemonEntity>, selectPokemon: (PokemonEntity) -> Unit, modifier: Modifier)
 
     @Composable
     fun PokemonItem(
-        singlePokemon: PokemonDetail,
+        singlePokemon: PokemonEntity,
         randomName: List<String>,
-        pokemonSelect: (PokemonDetail) -> Unit,
+        pokemonSelect: (PokemonEntity) -> Unit,
         modifier: Modifier
     )
 

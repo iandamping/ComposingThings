@@ -1,17 +1,9 @@
 package com.junemon.compose_stable.screen
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
 import com.junemon.compose_stable.feature.PokemonMviViewModel
-import com.junemon.compose_stable.navigation.ConstantNavigation
-import com.junemon.compose_stable.navigation.NavigationArgs
 import timber.log.Timber
 
 
@@ -27,20 +19,19 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
 
-    val state = pokemonMviVm.uiState
+    val cachedState = pokemonMviVm.uiStateCached
 
-    when {
-        state.isLoading -> pokemonMviVm.LottieLoading(loadingSize = 200.dp)
-        state.data.isNotEmpty() -> pokemonMviVm.ListPokemon(
-            listOfPokemon = state.data,
+    when{
+        cachedState.isLoading -> pokemonMviVm.LottieLoading(loadingSize = 200.dp)
+        cachedState.data.isNotEmpty() -> pokemonMviVm.ListPokemon(
+            listOfPokemon = cachedState.data,
             modifier = modifier,
             selectPokemon = { selectedPokemon ->
                 argument.invoke(
                     selectedPokemon.pokemonId
                 )
             })
-        state.failedMessage.isNotEmpty() -> {
-            Timber.e("errorn : ${state.failedMessage}")
-        }
+        cachedState.failedMessage.isNotEmpty() -> Timber.e("error : ${cachedState.failedMessage}")
+
     }
 }

@@ -1,10 +1,13 @@
 package com.junemon.compose_stable.core.domain.usecase
 
+import com.junemon.compose_stable.core.data.datasource.cache.PokemonEntity
 import com.junemon.compose_stable.core.domain.model.DomainResult
 import com.junemon.compose_stable.core.domain.repository.PokemonRepository
 import com.junemon.compose_stable.core.domain.response.PokemonDetail
 import com.junemon.compose_stable.core.domain.response.PokemonDetailSpecies
 import com.junemon.compose_stable.core.presentation.model.UiState
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
@@ -14,9 +17,17 @@ import javax.inject.Inject
  */
 class PokemonUseCaseImpl @Inject constructor(private val repository: PokemonRepository) :
     PokemonUseCase {
+    override fun getCachedPokemon(): Flow<UiState<List<PokemonEntity>>> {
+        return repository.getCachedPokemon().map {
+            when(it){
+                is DomainResult.Error -> UiState.Error(it.message)
+                is DomainResult.Content -> UiState.Content(it.data)
+            }
+        }
+    }
 
-    override suspend fun getPokemon(): UiState<List<PokemonDetail>> {
-        return when (val it = repository.getPokemon()) {
+    override suspend fun getRemotePokemon(): UiState<List<PokemonDetail>> {
+        return when (val it = repository.getRemotePokemon()) {
             is DomainResult.Error -> UiState.Error(it.message)
             is DomainResult.Content -> UiState.Content(it.data)
         }

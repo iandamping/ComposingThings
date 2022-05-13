@@ -8,11 +8,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.junemon.compose_stable.core.domain.response.PokemonDetail
+import com.junemon.compose_stable.core.data.datasource.cache.PokemonEntity
 import com.junemon.compose_stable.core.domain.usecase.PokemonUseCase
 import com.junemon.compose_stable.core.presentation.model.UiState
 import com.junemon.compose_stable.core.presentation.screens.ScreensUseCase
-import com.junemon.compose_stable.screen.HomeScreenState
+import com.junemon.compose_stable.screen.HomeScreenCachedState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -30,25 +30,27 @@ class PokemonMviViewModel @Inject constructor(
 ) :
     ViewModel() {
 
-    var uiState by mutableStateOf(HomeScreenState.initial())
+    var uiStateCached by mutableStateOf(HomeScreenCachedState.initial())
         private set
 
     init {
         viewModelScope.launch {
-            uiState = when (val data = dataUseCase.getPokemon()) {
-                is UiState.Content ->
-                    uiState.copy(isLoading = false, data = data.data)
+            dataUseCase.getCachedPokemon().collect {
+                uiStateCached = when (it) {
+                    is UiState.Content ->
+                        uiStateCached.copy(isLoading = false, data = it.data)
 
-                is UiState.Error ->
-                    uiState.copy(isLoading = false, failedMessage = data.message)
+                    is UiState.Error ->
+                        uiStateCached.copy(isLoading = false, failedMessage = it.message)
+                }
             }
         }
     }
 
     @Composable
     fun ListPokemon(
-        listOfPokemon: List<PokemonDetail>,
-        selectPokemon: (PokemonDetail) -> Unit,
+        listOfPokemon: List<PokemonEntity>,
+        selectPokemon: (PokemonEntity) -> Unit,
         modifier: Modifier
     ) = screenUseCase.ListPokemon(listOfPokemon, selectPokemon, modifier)
 

@@ -2,6 +2,8 @@ package com.junemon.compose_stable.core.di.module
 
 import com.junemon.compose_stable.core.data.datasource.PokemonRemoteDataSource
 import com.junemon.compose_stable.core.data.datasource.PokemonRemoteDataSourceImpl
+import com.junemon.compose_stable.core.data.datasource.cache.PokemonCacheDataSource
+import com.junemon.compose_stable.core.data.datasource.cache.PokemonCacheDataSourceImpl
 import com.junemon.compose_stable.core.data.datasource.remote.BaseSource
 import com.junemon.compose_stable.core.data.datasource.remote.BaseSourceImpl
 import com.junemon.compose_stable.core.data.repository.PokemonRepositoryImpl
@@ -30,6 +32,10 @@ interface DataModule {
     @Binds
     @Singleton
     fun bindsPokemonRemoteSource(dataSource: PokemonRemoteDataSourceImpl): PokemonRemoteDataSource
+
+    @Binds
+    @Singleton
+    fun bindsPokemonCacheDataSource(dataSource: PokemonCacheDataSourceImpl): PokemonCacheDataSource
 
     @Binds
     @Singleton
