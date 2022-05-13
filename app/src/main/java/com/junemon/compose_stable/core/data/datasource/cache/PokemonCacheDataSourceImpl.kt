@@ -17,4 +17,8 @@ class PokemonCacheDataSourceImpl @Inject constructor(private val dao:PokemonDao)
        dao.deletePokemonById(selectedId)
     }
 
+    override suspend fun deleteAllPokemon() {
+        dao.deleteAllPokemon()
+    }
+
 }

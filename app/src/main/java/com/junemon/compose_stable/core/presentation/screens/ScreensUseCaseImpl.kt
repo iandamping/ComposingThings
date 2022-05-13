@@ -75,7 +75,7 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                     modifier = modifier,
                     horizontalArrangement = Arrangement.spacedBy(Dp(8f))
                 ) {
-                    items(listOfPokemon) { singlePokemonItem ->
+                    items(listOfPokemon, key = {it.pokemonId}) { singlePokemonItem ->
                         val randomName: MutableList<String> =
                             listOfPokemon.shuffled().take(2).map { it.pokemonName }.toMutableList()
                         randomName.add(singlePokemonItem.pokemonName)

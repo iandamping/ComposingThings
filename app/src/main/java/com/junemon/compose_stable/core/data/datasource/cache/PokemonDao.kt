@@ -1,9 +1,6 @@
 package com.junemon.compose_stable.core.data.datasource.cache
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -17,4 +14,7 @@ interface PokemonDao {
 
     @Query("DELETE FROM cache_pokemon where pokemon_primary_id = :selectedId")
     suspend fun deletePokemonById(selectedId: Int)
+
+    @Query("DELETE FROM cache_pokemon")
+    suspend fun deleteAllPokemon()
 }

@@ -83,6 +83,7 @@ class PokemonRepositoryImpl @Inject constructor(
                                 DomainResult.Error(EMPTY_DATA)
                             } else {
                                 val cacheData = data.mapListToDatabase()
+                                cacheDataSource.deleteAllPokemon()
                                 cacheDataSource.insertPokemon(*cacheData.toTypedArray())
                                 DomainResult.Content(cacheData)
                             }

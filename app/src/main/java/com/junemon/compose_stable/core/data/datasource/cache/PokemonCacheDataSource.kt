@@ -9,4 +9,6 @@ interface PokemonCacheDataSource {
     suspend fun insertPokemon(vararg data: PokemonEntity)
 
     suspend fun deletePokemonById(selectedId: Int)
+
+    suspend fun deleteAllPokemon()
 }
