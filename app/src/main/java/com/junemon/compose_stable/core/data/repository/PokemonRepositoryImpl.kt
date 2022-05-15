@@ -13,6 +13,7 @@ import com.junemon.compose_stable.core.domain.model.mapToSpeciesDetail
 import com.junemon.compose_stable.core.domain.repository.PokemonRepository
 import com.junemon.compose_stable.core.domain.response.PokemonDetail
 import com.junemon.compose_stable.core.domain.response.PokemonDetailSpecies
+import com.junemon.compose_stable.util.NetworkUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.util.concurrent.TimeUnit
@@ -25,7 +26,8 @@ import javax.inject.Inject
  */
 class PokemonRepositoryImpl @Inject constructor(
     private val remoteDataSource: PokemonRemoteDataSource,
-    private val cacheDataSource: PokemonCacheDataSource
+    private val cacheDataSource: PokemonCacheDataSource,
+    private val networkUtils: NetworkUtils
 ) :
     PokemonRepository {
 
@@ -54,36 +56,19 @@ class PokemonRepositoryImpl @Inject constructor(
     override val getCachedPokemon: Flow<DomainResult<List<PokemonEntity>>>
         get() = cacheDataSource.loadPokemon().map { cacheValue ->
             if (cacheValue.isEmpty()) {
-                when (val result = remoteDataSource.getPokemon()) {
-                    is DataSourceResult.SourceValue -> {
-                        val remoteData = result.data.map { singleItem ->
-                            remoteDataSource.getDetailPokemon(singleItem.pokemonUrl).mapToDetail()
-                        }
-                        if (remoteData.isEmpty()) {
-                            DomainResult.Error(EMPTY_DATA)
-                        } else {
-                            val cacheData = remoteData.mapListToDatabase()
-                            cacheDataSource.insertPokemon(*cacheData.toTypedArray())
-                            DomainResult.Content(cacheData)
-                        }
-                    }
-                    is DataSourceResult.SourceError -> {
-                        DomainResult.Error(result.exception.message ?: NETWORK_ERROR)
-                    }
-                }
-            } else {
-                if (cacheValue.first().timestamp.isExpired()) {
+                if (!networkUtils.hasNetworkConnection()) {
+                    DomainResult.Error(NETWORK_ERROR)
+                } else {
                     when (val result = remoteDataSource.getPokemon()) {
                         is DataSourceResult.SourceValue -> {
-                            val data = result.data.map { singleItem ->
+                            val remoteData = result.data.map { singleItem ->
                                 remoteDataSource.getDetailPokemon(singleItem.pokemonUrl)
                                     .mapToDetail()
                             }
-                            if (data.isEmpty()) {
+                            if (remoteData.isEmpty()) {
                                 DomainResult.Error(EMPTY_DATA)
                             } else {
-                                val cacheData = data.mapListToDatabase()
-                                cacheDataSource.deleteAllPokemon()
+                                val cacheData = remoteData.mapListToDatabase()
                                 cacheDataSource.insertPokemon(*cacheData.toTypedArray())
                                 DomainResult.Content(cacheData)
                             }
@@ -92,7 +77,33 @@ class PokemonRepositoryImpl @Inject constructor(
                             DomainResult.Error(result.exception.message ?: NETWORK_ERROR)
                         }
                     }
-                } else DomainResult.Content(cacheValue)
+                }
+            } else {
+                if (!networkUtils.hasNetworkConnection()) {
+                    DomainResult.Content(cacheValue)
+                } else {
+                    if (cacheValue.first().timestamp.isExpired()) {
+                        when (val result = remoteDataSource.getPokemon()) {
+                            is DataSourceResult.SourceValue -> {
+                                val data = result.data.map { singleItem ->
+                                    remoteDataSource.getDetailPokemon(singleItem.pokemonUrl)
+                                        .mapToDetail()
+                                }
+                                if (data.isEmpty()) {
+                                    DomainResult.Error(EMPTY_DATA)
+                                } else {
+                                    val cacheData = data.mapListToDatabase()
+                                    cacheDataSource.deleteAllPokemon()
+                                    cacheDataSource.insertPokemon(*cacheData.toTypedArray())
+                                    DomainResult.Content(cacheData)
+                                }
+                            }
+                            is DataSourceResult.SourceError -> {
+                                DomainResult.Error(result.exception.message ?: NETWORK_ERROR)
+                            }
+                        }
+                    } else DomainResult.Content(cacheValue)
+                }
             }
         }
 

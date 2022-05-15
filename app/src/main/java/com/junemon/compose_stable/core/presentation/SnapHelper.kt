@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -115,7 +116,7 @@ class PagerSnapNestedScrollConnection(
 
 @Composable
 fun ComposePagerSnapHelper(
-    width: Dp,
+    width: Dp = 320.dp,
     content: @Composable (LazyListState) -> Unit
 ) {
 

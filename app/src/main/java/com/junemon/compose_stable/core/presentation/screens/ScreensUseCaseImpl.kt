@@ -20,13 +20,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import coil.compose.AsyncImage
 import coil.imageLoader
 import coil.request.CachePolicy
@@ -68,14 +69,13 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
         modifier: Modifier
     ) {
         ComposePagerSnapHelper(
-            width = 320.dp, //required
             content = { listState -> //this param is provided by the method itself, add this param below.
                 LazyRow(
                     state = listState,
                     modifier = modifier,
                     horizontalArrangement = Arrangement.spacedBy(Dp(8f))
                 ) {
-                    items(listOfPokemon, key = {it.pokemonId}) { singlePokemonItem ->
+                    items(listOfPokemon, key = { it.pokemonId }) { singlePokemonItem ->
                         val randomName: MutableList<String> =
                             listOfPokemon.shuffled().take(2).map { it.pokemonName }.toMutableList()
                         randomName.add(singlePokemonItem.pokemonName)
@@ -184,76 +184,60 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                 .fillMaxSize()
                 .padding(8.dp)
                 .clickable(enabled = isExpanded) {
-
+                    pokemonSelect.invoke(singlePokemon)
                 }
         ) {
-            if (isExpanded) {
-                Column(
-                    modifier
-                        .animateContentSize()
+            ConstraintLayout {
+                val (expandedText, expandedMainImage, expandedLogoImage, nonExpandedColumn) = createRefs()
+
+                Text(
+                    modifier = modifier
                         .padding(8.dp)
-                        .clickable {
-                            pokemonSelect(singlePokemon)
+                        .animateContentSize()
+                        .constrainAs(expandedText) {
+                            bottom.linkTo(expandedMainImage.bottom)
+                            centerHorizontallyTo(parent)
+                        },
+                    text = if(isExpanded) singlePokemon.pokemonName else "",
+                    style = MaterialTheme.typography.h4,
+                    textAlign = TextAlign.Center
+                )
+
+                AsyncImage(
+                    model = provideCoilImageRequest(imageUrl = singlePokemon.pokemonImage),
+                    contentDescription = null,
+                    imageLoader = provideCoilImageLoader(),
+                    colorFilter = if (!isExpanded) ColorFilter.tint(Color.Gray) else null,
+                    modifier = modifier
+                        .padding(8.dp)
+                        .constrainAs(expandedMainImage) {
+                            width = Dimension.wrapContent
+                            height = Dimension.fillToConstraints
+                            centerHorizontallyTo(parent)
+                            centerVerticallyTo(parent)
                         }
-                ) {
-                    Text(
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                            .animateContentSize(),
-                        text = singlePokemon.pokemonName,
-                        style = MaterialTheme.typography.h4,
-                        textAlign = TextAlign.Center
-                    )
-                    AsyncImage(
-                        model =
-                        provideCoilImageRequest(imageUrl = singlePokemon.pokemonImage),
-                        imageLoader = provideCoilImageLoader(),
-                        contentDescription = null,
-                        modifier = modifier
-                            .size(pokemonImageSizeDp)
-                            .padding(8.dp)
-                    )
+                )
 
+                Image(
+                    painter = painterResource(R.drawable.pokemon_logo),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .constrainAs(expandedLogoImage) {
+                            width = Dimension.wrapContent
+                            height = Dimension.wrapContent
+                            top.linkTo(parent.top)
+                            centerHorizontallyTo(parent)
+                        },
+                    contentScale = ContentScale.Crop
+                )
 
-                    Image(
-                        painter = painterResource(R.drawable.pokemon_logo),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .height(pokemonLogoHeightDp)
-                            .fillMaxWidth(),
-                        contentScale = ContentScale.Crop
-                    )
-
-                }
-
-            } else {
-                Box(modifier = modifier.fillMaxSize()) {
-                    val matrix = ColorMatrix()
-                    matrix.setToSaturation(0F)
-
-
-                    Image(
-                        painter = painterResource(R.drawable.pokemon_logo),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .height(pokemonLogoHeightDp)
-                            .fillMaxWidth(),
-                        contentScale = ContentScale.Crop
-                    )
-                    AsyncImage(
-                        model = provideCoilImageRequest(imageUrl = singlePokemon.pokemonImage),
-                        contentDescription = null,
-                        imageLoader = provideCoilImageLoader(),
-                        colorFilter = ColorFilter.tint(Color.Gray),
-                        modifier = modifier
-                            .size(pokemonImageSizeDp)
-                            .padding(8.dp)
-                    )
+                if (!isExpanded) {
                     Column(
                         modifier = modifier
-                            .fillMaxHeight()
-                            .padding(8.dp),
+                            .padding(8.dp)
+                            .constrainAs(nonExpandedColumn) {
+                                bottom.linkTo(expandedMainImage.bottom)
+                            },
                         verticalArrangement = Arrangement.Bottom
                     ) {
                         Button(
@@ -284,12 +268,10 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                             Text(text = randomName[2])
                         }
                     }
-
                 }
-
             }
-
         }
+
     }
 
     @Composable
@@ -361,19 +343,22 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
             )
 
             AsyncImage(
-                model = provideCoilImageRequest(imageUrl = pokemonItem.pokemonSmallImage3), contentDescription = null,
+                model = provideCoilImageRequest(imageUrl = pokemonItem.pokemonSmallImage3),
+                contentDescription = null,
                 imageLoader = provideCoilImageLoader(),
                 modifier = modifier
                     .size(100.dp)
                     .weight(1f)
             )
 
-            AsyncImage(model = provideCoilImageRequest(imageUrl = pokemonItem.pokemonSmallImage4)
-                , imageLoader = provideCoilImageLoader(),
+            AsyncImage(
+                model = provideCoilImageRequest(imageUrl = pokemonItem.pokemonSmallImage4),
+                imageLoader = provideCoilImageLoader(),
                 modifier = modifier
                     .size(100.dp)
                     .weight(1f),
-                contentDescription = null)
+                contentDescription = null
+            )
         }
     }
 
