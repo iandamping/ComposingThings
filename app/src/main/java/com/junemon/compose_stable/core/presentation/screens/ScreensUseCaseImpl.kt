@@ -1,5 +1,6 @@
 package com.junemon.compose_stable.core.presentation.screens
 
+import android.content.res.Configuration
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
 import androidx.compose.animation.animateContentSize
@@ -8,6 +9,7 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -21,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -40,6 +43,7 @@ import com.junemon.compose_stable.core.presentation.ComposePagerSnapHelper
 import com.junemon.compose_stable.util.PokemonConstant
 import com.junemon.compose_stable.util.PokemonConstant.ONE_SKILL_MONS
 import com.junemon.compose_stable.util.PokemonConstant.ONE_TYPE_MONS
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -68,25 +72,53 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
         selectPokemon: (PokemonEntity) -> Unit,
         modifier: Modifier
     ) {
+
+
+        val configuration = LocalConfiguration.current
         ComposePagerSnapHelper(
             content = { listState -> //this param is provided by the method itself, add this param below.
-                LazyRow(
-                    state = listState,
-                    modifier = modifier,
-                    horizontalArrangement = Arrangement.spacedBy(Dp(8f))
-                ) {
-                    items(listOfPokemon, key = { it.pokemonId }) { singlePokemonItem ->
-                        val randomName: MutableList<String> =
-                            listOfPokemon.shuffled().take(2).map { it.pokemonName }.toMutableList()
-                        randomName.add(singlePokemonItem.pokemonName)
+                when(configuration.orientation){
+                   Configuration.ORIENTATION_PORTRAIT -> {
+                       LazyColumn(
+                           state = listState,
+                           modifier = modifier,
+                           verticalArrangement = Arrangement.spacedBy(8.dp)
+                       ) {
+                           items(listOfPokemon, key = { it.pokemonId }) { singlePokemonItem ->
+                               val randomName: MutableList<String> =
+                                   listOfPokemon.shuffled().take(2).map { it.pokemonName }.toMutableList()
+                               randomName.add(singlePokemonItem.pokemonName)
 
-                        PokemonItem(
-                            singlePokemon = singlePokemonItem,
-                            randomName = randomName.shuffled(),
-                            pokemonSelect = selectPokemon,
-                            modifier = modifier.fillParentMaxWidth()
-                        )
-                    }
+                               VerticalPokemonItem(
+                                   singlePokemon = singlePokemonItem,
+                                   randomName = randomName.shuffled(),
+                                   pokemonSelect = selectPokemon,
+                                   modifier = modifier.fillParentMaxHeight()
+                               )
+                           }
+                       }
+
+                   }
+                   Configuration.ORIENTATION_LANDSCAPE ->{
+                       LazyRow(
+                           state = listState,
+                           modifier = modifier,
+                           horizontalArrangement = Arrangement.spacedBy(Dp(8f))
+                       ) {
+                           items(listOfPokemon, key = { it.pokemonId }) { singlePokemonItem ->
+                               val randomName: MutableList<String> =
+                                   listOfPokemon.shuffled().take(2).map { it.pokemonName }.toMutableList()
+                               randomName.add(singlePokemonItem.pokemonName)
+
+                               HorizontalPokemonItem(
+                                   singlePokemon = singlePokemonItem,
+                                   randomName = randomName.shuffled(),
+                                   pokemonSelect = selectPokemon,
+                                   modifier = modifier.fillParentMaxSize()
+                               )
+                           }
+                       }
+                   }
                 }
             }
         )
@@ -158,7 +190,7 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
 
 
     @Composable
-    override fun PokemonItem(
+    override fun HorizontalPokemonItem(
         singlePokemon: PokemonEntity,
         randomName: List<String>,
         pokemonSelect: (PokemonEntity) -> Unit,
@@ -181,7 +213,6 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
             elevation = Dp(4F),
             shape = RoundedCornerShape(8.dp),
             modifier = modifier
-                .fillMaxSize()
                 .padding(8.dp)
                 .clickable(enabled = isExpanded) {
                     pokemonSelect.invoke(singlePokemon)
@@ -190,17 +221,19 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
             ConstraintLayout {
                 val (expandedText, expandedMainImage, expandedLogoImage, nonExpandedColumn) = createRefs()
 
-                Text(
-                    modifier = modifier
-                        .padding(8.dp)
-                        .animateContentSize()
-                        .constrainAs(expandedText) {
-                            bottom.linkTo(expandedMainImage.bottom)
-                            centerHorizontallyTo(parent)
+                Image(
+                    painter = painterResource(R.drawable.pokemon_logo),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .height(100.dp)
+                        .constrainAs(expandedLogoImage) {
+                            top.linkTo(parent.top)
+                            end.linkTo(parent.end)
+                            start.linkTo(expandedMainImage.end)
+                            width = Dimension.fillToConstraints
+
                         },
-                    text = if(isExpanded) singlePokemon.pokemonName else "",
-                    style = MaterialTheme.typography.h4,
-                    textAlign = TextAlign.Center
+                    contentScale = ContentScale.Crop
                 )
 
                 AsyncImage(
@@ -208,40 +241,51 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                     contentDescription = null,
                     imageLoader = provideCoilImageLoader(),
                     colorFilter = if (!isExpanded) ColorFilter.tint(Color.Gray) else null,
-                    modifier = modifier
+                    modifier = Modifier
                         .padding(8.dp)
                         .constrainAs(expandedMainImage) {
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
                             width = Dimension.wrapContent
                             height = Dimension.fillToConstraints
-                            centerHorizontallyTo(parent)
+                            start.linkTo(parent.start)
                             centerVerticallyTo(parent)
                         }
                 )
 
-                Image(
-                    painter = painterResource(R.drawable.pokemon_logo),
-                    contentDescription = null,
+                Text(
                     modifier = Modifier
-                        .constrainAs(expandedLogoImage) {
-                            width = Dimension.wrapContent
-                            height = Dimension.wrapContent
-                            top.linkTo(parent.top)
-                            centerHorizontallyTo(parent)
+                        .padding(8.dp)
+                        .constrainAs(expandedText) {
+                            top.linkTo(expandedLogoImage.bottom)
+                            end.linkTo(parent.end)
+                            start.linkTo(expandedMainImage.end)
+                            width = Dimension.fillToConstraints
                         },
-                    contentScale = ContentScale.Crop
+                    text = if (isExpanded) singlePokemon.pokemonName else "",
+                    style = MaterialTheme.typography.h4,
+                    textAlign = TextAlign.Center
                 )
+
+
 
                 if (!isExpanded) {
                     Column(
-                        modifier = modifier
+                        modifier = Modifier
                             .padding(8.dp)
                             .constrainAs(nonExpandedColumn) {
-                                bottom.linkTo(expandedMainImage.bottom)
+                                end.linkTo(parent.end)
+                                start.linkTo(expandedMainImage.end)
+                                width = Dimension.fillToConstraints
+                                top.linkTo(expandedLogoImage.bottom)
+                                bottom.linkTo(parent.bottom)
                             },
                         verticalArrangement = Arrangement.Bottom
                     ) {
                         Button(
-                            modifier = modifier.padding(4.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp),
                             elevation = ButtonDefaults.elevation(8.dp),
                             shape = MaterialTheme.shapes.medium,
                             onClick = {
@@ -250,7 +294,9 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                             Text(text = randomName[0])
                         }
                         Button(
-                            modifier = modifier.padding(4.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 4.dp, end = 4.dp),
                             elevation = ButtonDefaults.elevation(8.dp),
                             shape = MaterialTheme.shapes.medium,
                             onClick = {
@@ -259,7 +305,123 @@ class ScreensUseCaseImpl @Inject constructor() : ScreensUseCase {
                             Text(text = randomName[1])
                         }
                         Button(
-                            modifier = modifier.padding(4.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp),
+                            elevation = ButtonDefaults.elevation(8.dp),
+                            shape = MaterialTheme.shapes.medium,
+                            onClick = {
+                                isExpanded = !isExpanded
+                            }) {
+                            Text(text = randomName[2])
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    @Composable
+    override fun VerticalPokemonItem(
+        singlePokemon: PokemonEntity,
+        randomName: List<String>,
+        pokemonSelect: (PokemonEntity) -> Unit,
+        modifier: Modifier
+    ) {
+        Timber.e("called in potrait")
+        var isExpanded by rememberSaveable {
+            mutableStateOf(false)
+        }
+
+        Card(
+            elevation = Dp(4F),
+            shape = RoundedCornerShape(8.dp),
+            modifier = modifier
+                .padding(8.dp)
+                .clickable(enabled = isExpanded) {
+                    pokemonSelect.invoke(singlePokemon)
+                }
+        ) {
+
+            ConstraintLayout {
+                val (expandedText, expandedMainImage, expandedLogoImage, nonExpandedColumn) = createRefs()
+
+                Image(
+                    painter = painterResource(R.drawable.pokemon_logo),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .height(100.dp)
+                        .constrainAs(expandedLogoImage) {
+                            top.linkTo(parent.top)
+                            centerHorizontallyTo(parent)
+                        },
+                    contentScale = ContentScale.Crop
+                )
+
+                AsyncImage(
+                    model = provideCoilImageRequest(imageUrl = singlePokemon.pokemonImage),
+                    contentDescription = null,
+                    imageLoader = provideCoilImageLoader(),
+                    colorFilter = if (!isExpanded) ColorFilter.tint(Color.Gray) else null,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .constrainAs(expandedMainImage) {
+                            top.linkTo(expandedLogoImage.bottom)
+                            bottom.linkTo(nonExpandedColumn.top)
+                            width = Dimension.matchParent
+                            height = Dimension.fillToConstraints
+                            centerHorizontallyTo(parent)
+                            centerVerticallyTo(parent)
+                        }
+                )
+
+                Text(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .constrainAs(expandedText) {
+                            bottom.linkTo(expandedMainImage.bottom)
+                            centerHorizontallyTo(parent)
+                        },
+                    text = if (isExpanded) singlePokemon.pokemonName else "",
+                    style = MaterialTheme.typography.h4,
+                    textAlign = TextAlign.Center
+                )
+
+
+                if (!isExpanded) {
+                    Column(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .constrainAs(nonExpandedColumn) {
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+                                width = Dimension.matchParent
+                                height = Dimension.wrapContent
+                                bottom.linkTo(parent.bottom)
+                            }
+
+                    ) {
+                        Button(
+                            modifier = Modifier.fillMaxWidth().padding(4.dp),
+                            elevation = ButtonDefaults.elevation(8.dp),
+                            shape = MaterialTheme.shapes.medium,
+                            onClick = {
+                                isExpanded = !isExpanded
+                            }) {
+                            Text(text = randomName[0])
+                        }
+                        Button(
+                            modifier = Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp),
+                            elevation = ButtonDefaults.elevation(8.dp),
+                            shape = MaterialTheme.shapes.medium,
+                            onClick = {
+                                isExpanded = !isExpanded
+                            }) {
+                            Text(text = randomName[1])
+                        }
+                        Button(
+                            modifier = Modifier.fillMaxWidth().padding(4.dp),
                             elevation = ButtonDefaults.elevation(8.dp),
                             shape = MaterialTheme.shapes.medium,
                             onClick = {

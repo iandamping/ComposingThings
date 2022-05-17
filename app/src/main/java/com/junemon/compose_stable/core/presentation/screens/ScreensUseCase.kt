@@ -27,7 +27,15 @@ interface ScreensUseCase {
     fun ListPokemon(listOfPokemon: List<PokemonEntity>, selectPokemon: (PokemonEntity) -> Unit, modifier: Modifier)
 
     @Composable
-    fun PokemonItem(
+    fun HorizontalPokemonItem(
+        singlePokemon: PokemonEntity,
+        randomName: List<String>,
+        pokemonSelect: (PokemonEntity) -> Unit,
+        modifier: Modifier
+    )
+
+    @Composable
+    fun VerticalPokemonItem(
         singlePokemon: PokemonEntity,
         randomName: List<String>,
         pokemonSelect: (PokemonEntity) -> Unit,
