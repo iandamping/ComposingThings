@@ -13,7 +13,7 @@ import retrofit2.http.Query
 interface MovieApi {
 
     @GET(POPULAR_MOVIE)
-    suspend fun getPopularMovie(@Query("api_key") apiKey: String = MOVIE_API_KEY): MovieMainResponse<MovieResponse>
+    suspend fun getPopularMovie(@Query("api_key") apiKey: String = MOVIE_API_KEY): MovieMainResponse
 
     @GET("$DETAIL_MOVIE{movie}")
     suspend fun getDetailMovie(
