@@ -2,7 +2,7 @@ package com.junemon.compose_stable
 
 import com.junemon.compose_stable.response.pokemon.*
 
-object Dummy {
+object DummyPokemon {
     val DUMMY_URL_POKEMON_RESULTS_1 = PokemonResultsResponse("a")
     val DUMMY_URL_POKEMON_RESULTS_2 = PokemonResultsResponse("a")
     val DUMMY_URL_POKEMON_RESULTS_3 = PokemonResultsResponse("a")
@@ -53,5 +53,39 @@ object Dummy {
             DUMMY_LIST_POKEMON_ABILITY,
             DUMMY_POKEMON_SPECIAL_1
         )
+    val DUMMY_ITEM_POKEMON_CHAR_1 = ItemPokemonCharacteristicResponse("a")
+    val DUMMY_ITEM_POKEMON_CHAR_2 = ItemPokemonCharacteristicResponse("a")
+    val DUMMY_ITEM_POKEMON_CHAR_3 = ItemPokemonCharacteristicResponse("a")
+    val DUMMY_LIST_ITEM_POKEMON_CHAR = listOf(
+        DUMMY_ITEM_POKEMON_CHAR_1, DUMMY_ITEM_POKEMON_CHAR_2,
+        DUMMY_ITEM_POKEMON_CHAR_3
+    )
+    val DUMMY_POKEMON_CHARACTERISTIC = PokemonCharacteristicResponse(DUMMY_LIST_ITEM_POKEMON_CHAR)
+    val DUMMY_POKEMON_AREA_NAME_1 = PokemonAreasName("a")
+    val DUMMY_POKEMON_AREA_NAME_2 = PokemonAreasName("a")
+    val DUMMY_POKEMON_AREA_NAME_3 = PokemonAreasName("a")
+    val DUMMY_POKEMON_AREA_1 = PokemonAreasResponse(DUMMY_POKEMON_AREA_NAME_1)
+    val DUMMY_POKEMON_AREA_2 = PokemonAreasResponse(DUMMY_POKEMON_AREA_NAME_2)
+    val DUMMY_POKEMON_AREA_3 = PokemonAreasResponse(DUMMY_POKEMON_AREA_NAME_3)
+    val DUMMY_LIST_POKEMON_AREA = listOf(
+        DUMMY_POKEMON_AREA_1, DUMMY_POKEMON_AREA_2,
+        DUMMY_POKEMON_AREA_3
+    )
 
+    val DUMMY_POKEMON_GENERATION = PokemonGenerationResponse("a")
+    val DUMMY_POKEMON_GROWTH_RATE = PokemonGrowthRateResponse("a")
+    val DUMMY_POKEMON_HABITAT = PokemonHabitatResponse("a")
+    val DUMMY_POKEMON_SHAPE = PokemonShapeResponse("a")
+    val DUMMY_POKEMON_SPECIES_COLOR = PokemonSpeciesColorResponse("a")
+    val DUMMY_POKEMON_SPECIES_EGG_GROUP = PokemonSpeciesEggGroupResponse("a")
+    val DUMMY_POKEMON_SPECIES_DETAIL = PokemonSpeciesDetailResponse(
+        1,
+        1,
+        DUMMY_POKEMON_SPECIES_COLOR,
+        listOf(DUMMY_POKEMON_SPECIES_EGG_GROUP),
+        DUMMY_POKEMON_GENERATION,
+        DUMMY_POKEMON_GROWTH_RATE,
+        DUMMY_POKEMON_HABITAT,
+        DUMMY_POKEMON_SHAPE
+    )
 }

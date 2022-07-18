@@ -12,12 +12,12 @@ interface NewsApi {
     @GET(GET_TOP_HEADLINES)
     suspend fun getNews(
         @Query("apiKey") apiKey: String = NEWS_API_KEY, @Query("country") country: String = "id"
-    ): NewsBaseResponse<NewsResponse>
+    ): NewsBaseResponse
 
     @GET(GET_TOP_HEADLINES)
     suspend fun searchNews(
         @Query("apiKey") apiKey: String = NEWS_API_KEY,
         @Query("country") country: String = "id",
         @Query("q") searchQuery: String
-    ): NewsBaseResponse<NewsResponse>
+    ): NewsBaseResponse
 }

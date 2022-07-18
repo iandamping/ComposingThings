@@ -5,8 +5,9 @@ import com.junemon.compose_stable.network.PokemonApi
 import com.junemon.compose_stable.response.pokemon.PokemonDetailResponse
 import com.junemon.compose_stable.response.pokemon.PokemonResultsResponse
 import com.junemon.compose_stable.response.pokemon.PokemonSpeciesDetailResponse
+import javax.inject.Inject
 
-class PokemonRemoteDataSourceImpl(private val api: PokemonApi) : PokemonRemoteDataSource {
+class PokemonRemoteDataSourceImpl @Inject constructor(private val api: PokemonApi) : PokemonRemoteDataSource {
 
     override suspend fun getPokemon(): List<PokemonResultsResponse> {
         try {
@@ -18,26 +19,42 @@ class PokemonRemoteDataSourceImpl(private val api: PokemonApi) : PokemonRemoteDa
     }
 
     override suspend fun getDetailPokemonByUrl(url: String): PokemonDetailResponse {
-        try {
-            return api.getPokemonDetailByUrl(url)
+        return try {
+            api.getPokemonDetailByUrl(url)
         } catch (e: Exception) {
             throw Exception(NetworkConstant.NETWORK_ERROR)
         }
     }
 
     override suspend fun getDetailPokemonCharacteristic(id: Int): String {
-       return api.getPokemonCharacteristic(id).descriptions[7].description
+        return try {
+            api.getPokemonCharacteristic(id).descriptions[0].description
+        } catch (e: Exception) {
+            throw Exception(NetworkConstant.NETWORK_ERROR)
+        }
     }
 
     override suspend fun getPokemonLocationAreas(id: Int): List<String> {
-        return api.getPokemonLocationAreas(id).map { it.area.name }
+        return try {
+            api.getPokemonLocationAreas(id).map { it.area.name }
+        } catch (e: Exception) {
+            throw Exception(NetworkConstant.NETWORK_ERROR)
+        }
     }
 
     override suspend fun getDetailPokemonById(id: Int): PokemonDetailResponse {
-        return api.getPokemonById(id)
+        return try {
+            api.getPokemonById(id)
+        } catch (e: Exception) {
+            throw Exception(NetworkConstant.NETWORK_ERROR)
+        }
     }
 
     override suspend fun getDetailSpeciesPokemon(url: String): PokemonSpeciesDetailResponse {
-        return api.getPokemonSpecies(url)
+        return try {
+            api.getPokemonSpecies(url)
+        } catch (e: Exception) {
+            throw Exception(NetworkConstant.NETWORK_ERROR)
+        }
     }
 }
