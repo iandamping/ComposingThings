@@ -1,6 +1,6 @@
 package com.junemon.compose_stable
 
-import com.junemon.compose_stable.response.pokemon.*
+import com.junemon.compose_stable.datasource.response.pokemon.*
 
 object DummyPokemon {
     val DUMMY_URL_POKEMON_RESULTS_1 = PokemonResultsResponse("a")
@@ -24,17 +24,29 @@ object DummyPokemon {
     val DUMMY_POKEMON_ABILITY_3 = PokemonAbilitiesResponse(DUMMY_POKEMON_ABILITY_NAME_1)
     val DUMMY_POKEMON_SPECIAL_1 = PokemonSpeciesResultResponse("a")
     val DUMMY_LIST_POKEMON_ABILITY = listOf(
-        DUMMY_POKEMON_ABILITY_1, DUMMY_POKEMON_ABILITY_2,
+        DUMMY_POKEMON_ABILITY_1,
+        DUMMY_POKEMON_ABILITY_2,
+        DUMMY_POKEMON_ABILITY_3,
+        DUMMY_POKEMON_ABILITY_1,
+        DUMMY_POKEMON_ABILITY_2,
         DUMMY_POKEMON_ABILITY_3
     )
     val DUMMY_LIST_POKEMON_BASIC_STAT = listOf(
         DUMMY_POKEMON_BASIC_STAT_1,
-        DUMMY_POKEMON_BASIC_STAT_2, DUMMY_POKEMON_BASIC_STAT_3
+        DUMMY_POKEMON_BASIC_STAT_2,
+        DUMMY_POKEMON_BASIC_STAT_3,
+        DUMMY_POKEMON_BASIC_STAT_1,
+        DUMMY_POKEMON_BASIC_STAT_2,
+        DUMMY_POKEMON_BASIC_STAT_3,
     )
     val DUMMY_POKEMON_MAIN_RESPONSE = PokemonMainResponse(
         listOf(
             DUMMY_URL_POKEMON_RESULTS_1,
-            DUMMY_URL_POKEMON_RESULTS_2, DUMMY_URL_POKEMON_RESULTS_3
+            DUMMY_URL_POKEMON_RESULTS_2,
+            DUMMY_URL_POKEMON_RESULTS_3,
+            DUMMY_URL_POKEMON_RESULTS_1,
+            DUMMY_URL_POKEMON_RESULTS_2,
+            DUMMY_URL_POKEMON_RESULTS_3
         )
     )
     val DUMMY_POKEMON_OFFICIAL_ARTWORK = PokemonOfficialArtworkResponse("a")

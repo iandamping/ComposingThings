@@ -2,9 +2,9 @@ package com.junemon.compose_stable.datasource
 
 import com.junemon.compose_stable.DummyMovies.DUMMY_DETAIL_MOVIE
 import com.junemon.compose_stable.DummyMovies.DUMMY_LIST_MOVIE
-import com.junemon.compose_stable.network.MovieApi
-import com.junemon.compose_stable.network.NetworkConstant
-import com.junemon.compose_stable.response.movie.MovieMainResponse
+import com.junemon.compose_stable.datasource.network.MovieApi
+import com.junemon.compose_stable.datasource.network.NetworkConstant
+import com.junemon.compose_stable.datasource.response.movie.MovieMainResponse
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -36,9 +36,9 @@ class MovieRemoteDataSourceImplTest {
         //then
         coVerify { api.getPopularMovie() }
         assertEquals(DUMMY_LIST_MOVIE, results)
-        assertEquals(DUMMY_LIST_MOVIE[0].id, 1)
-        assertEquals(DUMMY_LIST_MOVIE[1].id, 1)
-        assertEquals(DUMMY_LIST_MOVIE[2].id, 1)
+        assertEquals(DUMMY_LIST_MOVIE[0].id, results[0].id)
+        assertEquals(DUMMY_LIST_MOVIE[1].id, results[1].id)
+        assertEquals(DUMMY_LIST_MOVIE[2].id, results[2].id)
     }
 
     @Test
@@ -68,9 +68,9 @@ class MovieRemoteDataSourceImplTest {
         //then
         coVerify { api.getDetailMovie(1) }
         assertEquals(DUMMY_DETAIL_MOVIE, results)
-        assertEquals(DUMMY_DETAIL_MOVIE.id, 1)
-        assertEquals(DUMMY_DETAIL_MOVIE.budget, 1)
-        assertEquals(DUMMY_DETAIL_MOVIE.runtime, 1)
+        assertEquals(DUMMY_DETAIL_MOVIE.id, results.id)
+        assertEquals(DUMMY_DETAIL_MOVIE.budget, results.budget)
+        assertEquals(DUMMY_DETAIL_MOVIE.runtime, results.runtime)
     }
 
     @Test

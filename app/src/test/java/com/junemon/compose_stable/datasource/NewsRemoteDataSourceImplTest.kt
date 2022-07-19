@@ -3,8 +3,8 @@ package com.junemon.compose_stable.datasource
 import com.junemon.compose_stable.DummyNews.DUMMY_LIST_NEWS_RESPONSE
 import com.junemon.compose_stable.DummyNews.DUMMY_NEWS_BASE_RESPONSE
 import com.junemon.compose_stable.DummyPokemon
-import com.junemon.compose_stable.network.NetworkConstant
-import com.junemon.compose_stable.network.NewsApi
+import com.junemon.compose_stable.datasource.network.NetworkConstant
+import com.junemon.compose_stable.datasource.network.NewsApi
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -34,10 +34,9 @@ class NewsRemoteDataSourceImplTest {
         //then
         coVerify { api.getNews() }
         Assert.assertEquals(DUMMY_NEWS_BASE_RESPONSE.articles, results)
-        Assert.assertEquals(DUMMY_NEWS_BASE_RESPONSE.status, "a")
-        Assert.assertEquals(DUMMY_NEWS_BASE_RESPONSE.articles[0].newsAuthor, "a")
-        Assert.assertEquals(DUMMY_NEWS_BASE_RESPONSE.articles[1].newsAuthor, "a")
-        Assert.assertEquals(DUMMY_NEWS_BASE_RESPONSE.articles[2].newsAuthor, "a")
+        Assert.assertEquals(DUMMY_NEWS_BASE_RESPONSE.articles[0].newsAuthor, results[0].newsAuthor)
+        Assert.assertEquals(DUMMY_NEWS_BASE_RESPONSE.articles[1].newsAuthor, results[1].newsAuthor)
+        Assert.assertEquals(DUMMY_NEWS_BASE_RESPONSE.articles[2].newsAuthor, results[2].newsAuthor)
     }
 
     @Test
@@ -68,10 +67,9 @@ class NewsRemoteDataSourceImplTest {
         //then
         coVerify { api.searchNews(searchQuery = any()) }
         Assert.assertEquals(DUMMY_NEWS_BASE_RESPONSE.articles, results)
-        Assert.assertEquals(DUMMY_NEWS_BASE_RESPONSE.status, "a")
-        Assert.assertEquals(DUMMY_NEWS_BASE_RESPONSE.articles[0].newsAuthor, "a")
-        Assert.assertEquals(DUMMY_NEWS_BASE_RESPONSE.articles[1].newsAuthor, "a")
-        Assert.assertEquals(DUMMY_NEWS_BASE_RESPONSE.articles[2].newsAuthor, "a")
+        Assert.assertEquals(DUMMY_NEWS_BASE_RESPONSE.articles[0].newsAuthor, results[0].newsAuthor)
+        Assert.assertEquals(DUMMY_NEWS_BASE_RESPONSE.articles[1].newsAuthor, results[1].newsAuthor)
+        Assert.assertEquals(DUMMY_NEWS_BASE_RESPONSE.articles[2].newsAuthor, results[2].newsAuthor)
     }
 
     @Test

@@ -8,8 +8,8 @@ import com.junemon.compose_stable.DummyPokemon.DUMMY_POKEMON_SPECIES_DETAIL
 import com.junemon.compose_stable.DummyPokemon.DUMMY_URL_POKEMON_RESULTS_1
 import com.junemon.compose_stable.DummyPokemon.DUMMY_URL_POKEMON_RESULTS_2
 import com.junemon.compose_stable.DummyPokemon.DUMMY_URL_POKEMON_RESULTS_3
-import com.junemon.compose_stable.network.NetworkConstant.NETWORK_ERROR
-import com.junemon.compose_stable.network.PokemonApi
+import com.junemon.compose_stable.datasource.network.NetworkConstant.NETWORK_ERROR
+import com.junemon.compose_stable.datasource.network.PokemonApi
 import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -69,10 +69,10 @@ class PokemonRemoteDataSourceImplTest {
         //then
         coVerify { api.getPokemonDetailByUrl(any()) }
         Assert.assertEquals(DUMMY_POKEMON_DETAIL, results)
-        Assert.assertEquals(DUMMY_POKEMON_DETAIL.pokemonId, 1)
-        Assert.assertEquals(DUMMY_POKEMON_DETAIL.pokemonName, "a")
-        Assert.assertEquals(DUMMY_POKEMON_DETAIL.pokemonHeight, 1)
-        Assert.assertEquals(DUMMY_POKEMON_DETAIL.pokemonWeight, 1)
+        Assert.assertEquals(DUMMY_POKEMON_DETAIL.pokemonId, results.pokemonId)
+        Assert.assertEquals(DUMMY_POKEMON_DETAIL.pokemonName, results.pokemonName)
+        Assert.assertEquals(DUMMY_POKEMON_DETAIL.pokemonHeight, results.pokemonHeight)
+        Assert.assertEquals(DUMMY_POKEMON_DETAIL.pokemonWeight, results.pokemonWeight)
     }
 
     @Test
@@ -164,10 +164,10 @@ class PokemonRemoteDataSourceImplTest {
         //then
         coVerify { api.getPokemonById(any()) }
         Assert.assertEquals(DUMMY_POKEMON_DETAIL, results)
-        Assert.assertEquals(DUMMY_POKEMON_DETAIL.pokemonId, 1)
-        Assert.assertEquals(DUMMY_POKEMON_DETAIL.pokemonName, "a")
-        Assert.assertEquals(DUMMY_POKEMON_DETAIL.pokemonHeight, 1)
-        Assert.assertEquals(DUMMY_POKEMON_DETAIL.pokemonWeight, 1)
+        Assert.assertEquals(DUMMY_POKEMON_DETAIL.pokemonId, results.pokemonId)
+        Assert.assertEquals(DUMMY_POKEMON_DETAIL.pokemonName, results.pokemonName)
+        Assert.assertEquals(DUMMY_POKEMON_DETAIL.pokemonHeight, results.pokemonHeight)
+        Assert.assertEquals(DUMMY_POKEMON_DETAIL.pokemonWeight, results.pokemonWeight)
 
     }
 
@@ -198,11 +198,11 @@ class PokemonRemoteDataSourceImplTest {
         //then
         coVerify { api.getPokemonSpecies(any()) }
         Assert.assertEquals(DUMMY_POKEMON_SPECIES_DETAIL, results)
-        Assert.assertEquals(DUMMY_POKEMON_SPECIES_DETAIL.pokemonCaptureRate, 1)
-        Assert.assertEquals(DUMMY_POKEMON_SPECIES_DETAIL.pokemonHappines, 1)
-        Assert.assertEquals(DUMMY_POKEMON_SPECIES_DETAIL.pokemonColor.pokemonColor, "a")
-        Assert.assertEquals(DUMMY_POKEMON_SPECIES_DETAIL.pokemonShape.pokemonShape, "a")
-        Assert.assertEquals(DUMMY_POKEMON_SPECIES_DETAIL.pokemonGeneration.pokemonGenerationLString, "a")
+        Assert.assertEquals(DUMMY_POKEMON_SPECIES_DETAIL.pokemonCaptureRate, results.pokemonCaptureRate)
+        Assert.assertEquals(DUMMY_POKEMON_SPECIES_DETAIL.pokemonHappines, results.pokemonHappines)
+        Assert.assertEquals(DUMMY_POKEMON_SPECIES_DETAIL.pokemonColor.pokemonColor, results.pokemonColor.pokemonColor)
+        Assert.assertEquals(DUMMY_POKEMON_SPECIES_DETAIL.pokemonShape.pokemonShape, results.pokemonShape.pokemonShape)
+        Assert.assertEquals(DUMMY_POKEMON_SPECIES_DETAIL.pokemonGeneration.pokemonGenerationLString, results.pokemonGeneration.pokemonGenerationLString)
 
     }
 

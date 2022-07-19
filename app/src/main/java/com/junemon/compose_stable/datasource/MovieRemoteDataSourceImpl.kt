@@ -1,16 +1,25 @@
 package com.junemon.compose_stable.datasource
 
-import com.junemon.compose_stable.network.MovieApi
-import com.junemon.compose_stable.response.movie.MovieDetailResponse
-import com.junemon.compose_stable.response.movie.MovieResponse
+import com.junemon.compose_stable.datasource.network.MovieApi
+import com.junemon.compose_stable.datasource.network.NetworkConstant
+import com.junemon.compose_stable.datasource.response.movie.MovieDetailResponse
+import com.junemon.compose_stable.datasource.response.movie.MovieResponse
 import javax.inject.Inject
 
 class MovieRemoteDataSourceImpl @Inject constructor(private val api: MovieApi) : MovieRemoteDataSource {
     override suspend fun getMovie(): List<MovieResponse> {
-        return api.getPopularMovie().results
+        return try {
+            api.getPopularMovie().results
+        }catch (e:Exception){
+            throw e
+        }
     }
 
     override suspend fun getDetailMovie(movieId: Int): MovieDetailResponse {
-        return api.getDetailMovie(movieId)
+        return try {
+            api.getDetailMovie(movieId)
+        }catch (e:Exception){
+            throw e
+        }
     }
 }

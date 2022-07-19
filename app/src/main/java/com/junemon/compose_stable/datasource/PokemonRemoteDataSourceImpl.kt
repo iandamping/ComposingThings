@@ -1,10 +1,10 @@
 package com.junemon.compose_stable.datasource
 
-import com.junemon.compose_stable.network.NetworkConstant
-import com.junemon.compose_stable.network.PokemonApi
-import com.junemon.compose_stable.response.pokemon.PokemonDetailResponse
-import com.junemon.compose_stable.response.pokemon.PokemonResultsResponse
-import com.junemon.compose_stable.response.pokemon.PokemonSpeciesDetailResponse
+import com.junemon.compose_stable.datasource.network.NetworkConstant
+import com.junemon.compose_stable.datasource.network.PokemonApi
+import com.junemon.compose_stable.datasource.response.pokemon.PokemonDetailResponse
+import com.junemon.compose_stable.datasource.response.pokemon.PokemonResultsResponse
+import com.junemon.compose_stable.datasource.response.pokemon.PokemonSpeciesDetailResponse
 import javax.inject.Inject
 
 class PokemonRemoteDataSourceImpl @Inject constructor(private val api: PokemonApi) : PokemonRemoteDataSource {
@@ -14,7 +14,7 @@ class PokemonRemoteDataSourceImpl @Inject constructor(private val api: PokemonAp
             val response = api.getMainPokemon()
             return response.pokemonResults
         } catch (e: Exception) {
-            throw Exception(NetworkConstant.NETWORK_ERROR)
+            throw e
         }
     }
 
@@ -22,7 +22,7 @@ class PokemonRemoteDataSourceImpl @Inject constructor(private val api: PokemonAp
         return try {
             api.getPokemonDetailByUrl(url)
         } catch (e: Exception) {
-            throw Exception(NetworkConstant.NETWORK_ERROR)
+            throw e
         }
     }
 
@@ -30,7 +30,7 @@ class PokemonRemoteDataSourceImpl @Inject constructor(private val api: PokemonAp
         return try {
             api.getPokemonCharacteristic(id).descriptions[0].description
         } catch (e: Exception) {
-            throw Exception(NetworkConstant.NETWORK_ERROR)
+            throw e
         }
     }
 
@@ -38,7 +38,7 @@ class PokemonRemoteDataSourceImpl @Inject constructor(private val api: PokemonAp
         return try {
             api.getPokemonLocationAreas(id).map { it.area.name }
         } catch (e: Exception) {
-            throw Exception(NetworkConstant.NETWORK_ERROR)
+            throw e
         }
     }
 
@@ -46,7 +46,7 @@ class PokemonRemoteDataSourceImpl @Inject constructor(private val api: PokemonAp
         return try {
             api.getPokemonById(id)
         } catch (e: Exception) {
-            throw Exception(NetworkConstant.NETWORK_ERROR)
+            throw e
         }
     }
 
@@ -54,7 +54,7 @@ class PokemonRemoteDataSourceImpl @Inject constructor(private val api: PokemonAp
         return try {
             api.getPokemonSpecies(url)
         } catch (e: Exception) {
-            throw Exception(NetworkConstant.NETWORK_ERROR)
+            throw e
         }
     }
 }

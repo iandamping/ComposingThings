@@ -1,7 +1,7 @@
 package com.junemon.compose_stable.datasource
 
-import com.junemon.compose_stable.response.movie.MovieDetailResponse
-import com.junemon.compose_stable.response.movie.MovieResponse
+import com.junemon.compose_stable.datasource.response.movie.MovieDetailResponse
+import com.junemon.compose_stable.datasource.response.movie.MovieResponse
 
 interface MovieRemoteDataSource {
 

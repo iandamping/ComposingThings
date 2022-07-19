@@ -1,8 +1,8 @@
 package com.junemon.compose_stable.datasource
 
-import com.junemon.compose_stable.response.pokemon.PokemonDetailResponse
-import com.junemon.compose_stable.response.pokemon.PokemonResultsResponse
-import com.junemon.compose_stable.response.pokemon.PokemonSpeciesDetailResponse
+import com.junemon.compose_stable.datasource.response.pokemon.PokemonDetailResponse
+import com.junemon.compose_stable.datasource.response.pokemon.PokemonResultsResponse
+import com.junemon.compose_stable.datasource.response.pokemon.PokemonSpeciesDetailResponse
 
 interface PokemonRemoteDataSource {
 
