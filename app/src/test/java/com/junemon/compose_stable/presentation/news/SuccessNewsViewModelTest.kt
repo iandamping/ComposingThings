@@ -1,16 +1,16 @@
 package com.junemon.compose_stable.presentation.news
 
 import com.junemon.compose_stable.DummyNews
-import com.junemon.compose_stable.domain.Results
-import com.junemon.compose_stable.domain.repository.NewsRepository
-import com.junemon.compose_stable.presentation.NewsViewModel
+import com.junemon.compose_stable.core.domain.Results
+import com.junemon.compose_stable.core.domain.repository.NewsRepository
+import com.junemon.compose_stable.core.presentation.NewsViewModel
 import com.junemon.compose_stable.utils.MainCoroutineScopeRule
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -24,11 +24,11 @@ class SuccessNewsViewModelTest {
     var mainCoroutineRule = MainCoroutineScopeRule()
 
     lateinit var sut: NewsViewModel
-    lateinit var repository:NewsRepository
+    lateinit var repository: NewsRepository
 
     @Before
     fun setUp() {
-        repository = mockk{
+        repository = mockk {
             coEvery { this@mockk.getNews() } returns Results.Success(DummyNews.DUMMY_LIST_NEWS_RESPONSE.map { it.toDomain() })
             coEvery { this@mockk.searchNews(any()) } returns Results.Success(DummyNews.DUMMY_LIST_NEWS_RESPONSE.map { it.toDomain() })
         }
@@ -45,12 +45,14 @@ class SuccessNewsViewModelTest {
     }
 
     @Test
-    fun `getNews return success inside init viewModel`() = runTest{
-        assertEquals(DummyNews.DUMMY_LIST_NEWS_RESPONSE.map { it.toDomain() }, sut.uiStateOfNews.data)
+    fun `getNews return success inside init viewModel`() = runTest {
+        assertEquals(
+            DummyNews.DUMMY_LIST_NEWS_RESPONSE.map { it.toDomain() },
+            sut.uiStateOfNews.data
+        )
         assertEquals(false, sut.uiStateOfNews.isLoading)
         assertEquals("", sut.uiStateOfNews.failedMessage)
     }
-
 
 
     @Test

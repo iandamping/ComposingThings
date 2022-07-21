@@ -1,11 +1,11 @@
 package com.junemon.compose_stable.presentation.news
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.junemon.compose_stable.datasource.network.NetworkConstant.NETWORK_ERROR
-import com.junemon.compose_stable.domain.Results
-import com.junemon.compose_stable.domain.model.news.News
-import com.junemon.compose_stable.domain.repository.NewsRepository
-import com.junemon.compose_stable.presentation.NewsViewModel
+import com.junemon.compose_stable.core.datasource.network.NetworkConstant.NETWORK_ERROR
+import com.junemon.compose_stable.core.domain.Results
+import com.junemon.compose_stable.core.domain.model.news.News
+import com.junemon.compose_stable.core.domain.repository.NewsRepository
+import com.junemon.compose_stable.core.presentation.NewsViewModel
 import com.junemon.compose_stable.utils.MainCoroutineScopeRule
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -61,7 +61,10 @@ class FailedNewsViewModelTest {
 
         Assert.assertEquals(emptyList<News>(), sut.uiStateOfSearchNews.data) // assert state value
         Assert.assertEquals(false, sut.uiStateOfSearchNews.isLoading) // assert state value
-        Assert.assertEquals(NETWORK_ERROR, sut.uiStateOfSearchNews.failedMessage) // assert state value
+        Assert.assertEquals(
+            NETWORK_ERROR,
+            sut.uiStateOfSearchNews.failedMessage
+        ) // assert state value
 
     }
 }

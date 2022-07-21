@@ -1,10 +1,10 @@
 package com.junemon.compose_stable
 
-import com.junemon.compose_stable.datasource.network.NetworkConstant
-import com.junemon.compose_stable.datasource.response.movie.MovieDetailResponse
-import com.junemon.compose_stable.datasource.response.movie.MovieResponse
-import com.junemon.compose_stable.domain.model.movie.Movie
-import com.junemon.compose_stable.domain.model.movie.MovieDetail
+import com.junemon.compose_stable.core.datasource.network.NetworkConstant
+import com.junemon.compose_stable.core.datasource.response.movie.MovieDetailResponse
+import com.junemon.compose_stable.core.datasource.response.movie.MovieResponse
+import com.junemon.compose_stable.core.domain.model.movie.Movie
+import com.junemon.compose_stable.core.domain.model.movie.MovieDetail
 
 object DummyMovies {
 
@@ -80,7 +80,8 @@ object DummyMovies {
         1
     )
 
-    val DUMMY_REPO_MOVIE = Movie(1,"a","${NetworkConstant.imageFormatter}a","a")
+    val DUMMY_REPO_MOVIE = Movie(1, "a", "${NetworkConstant.imageFormatter}a", "a")
 
-    val DUMMY_REPO_DETAIL_MOVIE = MovieDetail(null,1,"${NetworkConstant.imageFormatter}a","a","a")
+    val DUMMY_REPO_DETAIL_MOVIE =
+        MovieDetail(null, 1, "${NetworkConstant.imageFormatter}a", "a", "a")
 }

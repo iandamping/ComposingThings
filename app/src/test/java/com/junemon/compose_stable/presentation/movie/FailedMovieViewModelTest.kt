@@ -1,10 +1,10 @@
 package com.junemon.compose_stable.presentation.movie
 
-import com.junemon.compose_stable.datasource.network.NetworkConstant.NETWORK_ERROR
-import com.junemon.compose_stable.domain.Results
-import com.junemon.compose_stable.domain.model.news.News
-import com.junemon.compose_stable.domain.repository.MovieRepository
-import com.junemon.compose_stable.presentation.MovieViewModel
+import com.junemon.compose_stable.core.datasource.network.NetworkConstant.NETWORK_ERROR
+import com.junemon.compose_stable.core.domain.Results
+import com.junemon.compose_stable.core.domain.model.news.News
+import com.junemon.compose_stable.core.domain.repository.MovieRepository
+import com.junemon.compose_stable.core.presentation.MovieViewModel
 import com.junemon.compose_stable.utils.MainCoroutineScopeRule
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -26,7 +26,7 @@ class FailedMovieViewModelTest {
 
     @Before
     fun setUp() {
-        repository = mockk{
+        repository = mockk {
             coEvery { this@mockk.getMovie() } returns Results.Error(NETWORK_ERROR)
             coEvery { this@mockk.getDetailMovie(any()) } returns Results.Error(NETWORK_ERROR)
         }
@@ -43,12 +43,11 @@ class FailedMovieViewModelTest {
     }
 
     @Test
-    fun `getMovie return error inside init viewModel`() = runTest{
+    fun `getMovie return error inside init viewModel`() = runTest {
         Assert.assertEquals(emptyList<News>(), sut.uiMovieState.data)
         Assert.assertEquals(false, sut.uiMovieState.isLoading)
         Assert.assertEquals(NETWORK_ERROR, sut.uiMovieState.failedMessage)
     }
-
 
 
     @Test
@@ -57,7 +56,10 @@ class FailedMovieViewModelTest {
 
         Assert.assertEquals(null, sut.uiMovieDetailState.data) // assert state value
         Assert.assertEquals(false, sut.uiMovieDetailState.isLoading) // assert state value
-        Assert.assertEquals(NETWORK_ERROR, sut.uiMovieDetailState.failedMessage) // assert state value
+        Assert.assertEquals(
+            NETWORK_ERROR,
+            sut.uiMovieDetailState.failedMessage
+        ) // assert state value
 
     }
 }

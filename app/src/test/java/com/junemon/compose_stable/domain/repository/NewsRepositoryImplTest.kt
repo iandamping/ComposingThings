@@ -1,9 +1,11 @@
 package com.junemon.compose_stable.domain.repository
 
 import com.junemon.compose_stable.DummyNews.DUMMY_LIST_NEWS_RESPONSE
-import com.junemon.compose_stable.datasource.NewsRemoteDataSource
-import com.junemon.compose_stable.datasource.network.NetworkConstant
-import com.junemon.compose_stable.domain.Results
+import com.junemon.compose_stable.core.datasource.NewsRemoteDataSource
+import com.junemon.compose_stable.core.datasource.network.NetworkConstant
+import com.junemon.compose_stable.core.domain.Results
+import com.junemon.compose_stable.core.domain.repository.NewsRepository
+import com.junemon.compose_stable.core.domain.repository.NewsRepositoryImpl
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

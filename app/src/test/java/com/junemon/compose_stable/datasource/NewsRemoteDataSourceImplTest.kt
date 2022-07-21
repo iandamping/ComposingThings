@@ -1,10 +1,10 @@
 package com.junemon.compose_stable.datasource
 
-import com.junemon.compose_stable.DummyNews.DUMMY_LIST_NEWS_RESPONSE
 import com.junemon.compose_stable.DummyNews.DUMMY_NEWS_BASE_RESPONSE
-import com.junemon.compose_stable.DummyPokemon
-import com.junemon.compose_stable.datasource.network.NetworkConstant
-import com.junemon.compose_stable.datasource.network.NewsApi
+import com.junemon.compose_stable.core.datasource.NewsRemoteDataSource
+import com.junemon.compose_stable.core.datasource.NewsRemoteDataSourceImpl
+import com.junemon.compose_stable.core.datasource.network.NetworkConstant
+import com.junemon.compose_stable.core.datasource.network.NewsApi
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -26,7 +26,7 @@ class NewsRemoteDataSourceImplTest {
     }
 
     @Test
-    fun `getNews successfully return value`()= runTest{
+    fun `getNews successfully return value`() = runTest {
         //given
         coEvery { api.getNews() } returns DUMMY_NEWS_BASE_RESPONSE
         //when
@@ -40,14 +40,14 @@ class NewsRemoteDataSourceImplTest {
     }
 
     @Test
-    fun `getNews failed and Throw exception`()= runTest{
+    fun `getNews failed and Throw exception`() = runTest {
         //given
         var exceptionThrown = false
         coEvery { api.getNews() } throws Exception(NetworkConstant.NETWORK_ERROR)
         //when
         try {
             sut.getNews()
-        } catch(exception: Exception) {
+        } catch (exception: Exception) {
             // Maybe put some assertions on the exception here.
             Assert.assertEquals(exception.message, NetworkConstant.NETWORK_ERROR)
             exceptionThrown = true
@@ -59,7 +59,7 @@ class NewsRemoteDataSourceImplTest {
 
 
     @Test
-    fun `searchNews successfully return value`()= runTest{
+    fun `searchNews successfully return value`() = runTest {
         //given
         coEvery { api.searchNews(searchQuery = "a") } returns DUMMY_NEWS_BASE_RESPONSE
         //when
@@ -73,14 +73,14 @@ class NewsRemoteDataSourceImplTest {
     }
 
     @Test
-    fun `searchNews failed and Throw exception`()= runTest{
+    fun `searchNews failed and Throw exception`() = runTest {
         //given
         var exceptionThrown = false
         coEvery { api.searchNews(searchQuery = any()) } throws Exception(NetworkConstant.NETWORK_ERROR)
         //when
         try {
             sut.searchNews("a")
-        } catch(exception: Exception) {
+        } catch (exception: Exception) {
             // Maybe put some assertions on the exception here.
             Assert.assertEquals(exception.message, NetworkConstant.NETWORK_ERROR)
             exceptionThrown = true

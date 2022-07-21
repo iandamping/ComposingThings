@@ -3,9 +3,11 @@ package com.junemon.compose_stable.domain.repository
 import com.junemon.compose_stable.DummyPokemon.DUMMY_POKEMON_DETAIL
 import com.junemon.compose_stable.DummyPokemon.DUMMY_POKEMON_MAIN_RESPONSE
 import com.junemon.compose_stable.DummyPokemon.DUMMY_POKEMON_SPECIES_DETAIL
-import com.junemon.compose_stable.datasource.PokemonRemoteDataSource
-import com.junemon.compose_stable.datasource.network.NetworkConstant
-import com.junemon.compose_stable.domain.Results
+import com.junemon.compose_stable.core.datasource.PokemonRemoteDataSource
+import com.junemon.compose_stable.core.datasource.network.NetworkConstant
+import com.junemon.compose_stable.core.domain.Results
+import com.junemon.compose_stable.core.domain.repository.PokemonRepository
+import com.junemon.compose_stable.core.domain.repository.PokemonRepositoryImpl
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

@@ -1,6 +1,7 @@
 package com.junemon.compose_stable
 
-import com.junemon.compose_stable.datasource.response.pokemon.*
+import com.junemon.compose_stable.core.datasource.response.pokemon.*
+
 
 object DummyPokemon {
     val DUMMY_URL_POKEMON_RESULTS_1 = PokemonResultsResponse("a")

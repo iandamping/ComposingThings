@@ -2,9 +2,11 @@ package com.junemon.compose_stable.datasource
 
 import com.junemon.compose_stable.DummyMovies.DUMMY_DETAIL_MOVIE
 import com.junemon.compose_stable.DummyMovies.DUMMY_LIST_MOVIE
-import com.junemon.compose_stable.datasource.network.MovieApi
-import com.junemon.compose_stable.datasource.network.NetworkConstant
-import com.junemon.compose_stable.datasource.response.movie.MovieMainResponse
+import com.junemon.compose_stable.core.datasource.MovieRemoteDataSource
+import com.junemon.compose_stable.core.datasource.MovieRemoteDataSourceImpl
+import com.junemon.compose_stable.core.datasource.network.MovieApi
+import com.junemon.compose_stable.core.datasource.network.NetworkConstant
+import com.junemon.compose_stable.core.datasource.response.movie.MovieMainResponse
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

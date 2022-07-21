@@ -1,9 +1,10 @@
 package com.junemon.compose_stable.presentation
 
-import com.junemon.compose_stable.datasource.network.NetworkConstant
-import com.junemon.compose_stable.domain.Results
-import com.junemon.compose_stable.domain.model.pokemon.PokemonDetail
-import com.junemon.compose_stable.domain.repository.PokemonRepository
+import com.junemon.compose_stable.core.datasource.network.NetworkConstant
+import com.junemon.compose_stable.core.domain.Results
+import com.junemon.compose_stable.core.domain.model.pokemon.PokemonDetail
+import com.junemon.compose_stable.core.domain.repository.PokemonRepository
+import com.junemon.compose_stable.core.presentation.PokemonViewModel
 import com.junemon.compose_stable.utils.MainCoroutineScopeRule
 import io.mockk.coEvery
 import io.mockk.mockk
