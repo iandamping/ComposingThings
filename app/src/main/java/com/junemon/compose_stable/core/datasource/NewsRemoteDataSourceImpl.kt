@@ -2,9 +2,10 @@ package com.junemon.compose_stable.core.datasource
 
 import com.junemon.compose_stable.core.datasource.network.NewsApi
 import com.junemon.compose_stable.core.datasource.response.news.NewsResponse
+import com.junemon.compose_stable.di.NewsApiInterface
 import javax.inject.Inject
 
-class NewsRemoteDataSourceImpl @Inject constructor(private val api: NewsApi) :
+class NewsRemoteDataSourceImpl @Inject constructor(@NewsApiInterface private val api: NewsApi) :
     NewsRemoteDataSource {
     override suspend fun getNews(): List<NewsResponse> {
         return try {

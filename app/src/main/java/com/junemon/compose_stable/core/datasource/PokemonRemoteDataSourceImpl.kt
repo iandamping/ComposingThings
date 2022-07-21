@@ -4,9 +4,10 @@ import com.junemon.compose_stable.core.datasource.network.PokemonApi
 import com.junemon.compose_stable.core.datasource.response.pokemon.PokemonDetailResponse
 import com.junemon.compose_stable.core.datasource.response.pokemon.PokemonResultsResponse
 import com.junemon.compose_stable.core.datasource.response.pokemon.PokemonSpeciesDetailResponse
+import com.junemon.compose_stable.di.PokemonApiInterface
 import javax.inject.Inject
 
-class PokemonRemoteDataSourceImpl @Inject constructor(private val api: PokemonApi) :
+class PokemonRemoteDataSourceImpl @Inject constructor(@PokemonApiInterface private val api: PokemonApi) :
     PokemonRemoteDataSource {
 
     override suspend fun getPokemon(): List<PokemonResultsResponse> {

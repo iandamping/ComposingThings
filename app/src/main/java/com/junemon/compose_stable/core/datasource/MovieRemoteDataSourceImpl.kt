@@ -3,9 +3,10 @@ package com.junemon.compose_stable.core.datasource
 import com.junemon.compose_stable.core.datasource.network.MovieApi
 import com.junemon.compose_stable.core.datasource.response.movie.MovieDetailResponse
 import com.junemon.compose_stable.core.datasource.response.movie.MovieResponse
+import com.junemon.compose_stable.di.MovieApiInterface
 import javax.inject.Inject
 
-class MovieRemoteDataSourceImpl @Inject constructor(private val api: MovieApi) :
+class MovieRemoteDataSourceImpl @Inject constructor(@MovieApiInterface private val api: MovieApi) :
     MovieRemoteDataSource {
     override suspend fun getMovie(): List<MovieResponse> {
         return try {

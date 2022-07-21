@@ -9,6 +9,7 @@ import com.junemon.compose_stable.core.domain.Results
 import com.junemon.compose_stable.core.domain.repository.NewsRepository
 import com.junemon.compose_stable.core.presentation.state.news.NewsSearchState
 import com.junemon.compose_stable.core.presentation.state.news.NewsState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
@@ -16,6 +17,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @FlowPreview
+@HiltViewModel
 class NewsViewModel @Inject constructor(private val repository: NewsRepository) : ViewModel() {
 
     private var fetchJob: Job? = null
