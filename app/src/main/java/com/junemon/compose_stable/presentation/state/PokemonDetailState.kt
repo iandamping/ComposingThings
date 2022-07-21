@@ -1,14 +1,14 @@
-package com.junemon.compose_stable.presentation.state.movie
+package com.junemon.compose_stable.presentation.state
 
-import com.junemon.compose_stable.domain.model.movie.MovieDetail
+import com.junemon.compose_stable.domain.model.pokemon.PokemonDetail
 
-data class DetailMovieState(
+data class PokemonDetailState(
     val isLoading: Boolean,
     val failedMessage: String,
-    val data: MovieDetail?,
+    val data: PokemonDetail?
 ) {
     companion object {
-        fun initial() = DetailMovieState(
+        fun initial() = PokemonDetailState(
             isLoading = true,
             failedMessage = "",
             data = null

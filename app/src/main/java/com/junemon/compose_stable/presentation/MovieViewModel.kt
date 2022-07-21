@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.junemon.compose_stable.domain.Results
 import com.junemon.compose_stable.domain.repository.MovieRepository
-import com.junemon.compose_stable.presentation.state.movie.DetailMovieState
+import com.junemon.compose_stable.presentation.state.movie.MovieDetailState
 import com.junemon.compose_stable.presentation.state.movie.MovieState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +22,7 @@ class MovieViewModel @Inject constructor(private val repository: MovieRepository
     var uiMovieState by mutableStateOf(MovieState.initial())
         private set
 
-    var uiDetailMovieState by mutableStateOf(DetailMovieState.initial())
+    var uiMovieDetailState by mutableStateOf(MovieDetailState.initial())
         private set
 
     private val _movieId: MutableStateFlow<Int?> = MutableStateFlow(null)
@@ -45,12 +45,12 @@ class MovieViewModel @Inject constructor(private val repository: MovieRepository
         viewModelScope.launch {
             movieId.collect { id ->
                 if (id != null) {
-                    uiDetailMovieState = when (val results = repository.getDetailMovie(id)) {
-                        is Results.Error -> uiDetailMovieState.copy(
+                    uiMovieDetailState = when (val results = repository.getDetailMovie(id)) {
+                        is Results.Error -> uiMovieDetailState.copy(
                             isLoading = false,
                             failedMessage = results.errorMessage
                         )
-                        is Results.Success -> uiDetailMovieState.copy(
+                        is Results.Success -> uiMovieDetailState.copy(
                             isLoading = false,
                             data = results.data
                         )

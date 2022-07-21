@@ -1,8 +1,9 @@
-package com.junemon.compose_stable.presentation
+package com.junemon.compose_stable.presentation.movie
 
 import com.junemon.compose_stable.DummyMovies
 import com.junemon.compose_stable.domain.Results
 import com.junemon.compose_stable.domain.repository.MovieRepository
+import com.junemon.compose_stable.presentation.MovieViewModel
 import com.junemon.compose_stable.utils.MainCoroutineScopeRule
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -54,9 +55,9 @@ class SuccessMovieViewModelTest {
     fun `getDetailMovie return success inside init viewModel using userQuery value`() = runTest {
         sut.setMovieId(2345)
 
-        assertEquals(DummyMovies.DUMMY_DETAIL_MOVIE.toDomain(), sut.uiDetailMovieState.data) // assert state value
-        assertEquals(false, sut.uiDetailMovieState.isLoading) // assert state value
-        assertEquals("", sut.uiDetailMovieState.failedMessage) // assert state value
+        assertEquals(DummyMovies.DUMMY_DETAIL_MOVIE.toDomain(), sut.uiMovieDetailState.data) // assert state value
+        assertEquals(false, sut.uiMovieDetailState.isLoading) // assert state value
+        assertEquals("", sut.uiMovieDetailState.failedMessage) // assert state value
 
     }
 }

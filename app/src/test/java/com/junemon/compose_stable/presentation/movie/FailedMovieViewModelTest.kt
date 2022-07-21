@@ -1,10 +1,10 @@
-package com.junemon.compose_stable.presentation
+package com.junemon.compose_stable.presentation.movie
 
-import com.junemon.compose_stable.DummyMovies
 import com.junemon.compose_stable.datasource.network.NetworkConstant.NETWORK_ERROR
 import com.junemon.compose_stable.domain.Results
 import com.junemon.compose_stable.domain.model.news.News
 import com.junemon.compose_stable.domain.repository.MovieRepository
+import com.junemon.compose_stable.presentation.MovieViewModel
 import com.junemon.compose_stable.utils.MainCoroutineScopeRule
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -55,9 +55,9 @@ class FailedMovieViewModelTest {
     fun `getDetailMovie return error inside init viewModel using userQuery value`() = runTest {
         sut.setMovieId(2345)
 
-        Assert.assertEquals(null, sut.uiDetailMovieState.data) // assert state value
-        Assert.assertEquals(false, sut.uiDetailMovieState.isLoading) // assert state value
-        Assert.assertEquals(NETWORK_ERROR, sut.uiDetailMovieState.failedMessage) // assert state value
+        Assert.assertEquals(null, sut.uiMovieDetailState.data) // assert state value
+        Assert.assertEquals(false, sut.uiMovieDetailState.isLoading) // assert state value
+        Assert.assertEquals(NETWORK_ERROR, sut.uiMovieDetailState.failedMessage) // assert state value
 
     }
 }
