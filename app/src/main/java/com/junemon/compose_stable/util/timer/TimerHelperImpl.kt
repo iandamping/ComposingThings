@@ -2,7 +2,6 @@ package com.junemon.compose_stable.util.timer
 
 import android.os.CountDownTimer
 import com.junemon.compose_stable.util.TimerConstant
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -10,7 +9,7 @@ import javax.inject.Inject
  * Github https://github.com/iandamping
  * Indonesia.
  */
-class BoxingTimerImpl @Inject constructor() : BoxingTimer {
+class TimerHelperImpl @Inject constructor() : TimerHelper {
 
     private var timer: CountDownTimer? = null
 

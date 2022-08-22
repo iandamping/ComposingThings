@@ -2,8 +2,8 @@ package com.junemon.compose_stable.di
 
 import com.junemon.compose_stable.util.ringer.BellRinger
 import com.junemon.compose_stable.util.ringer.BellRingerImpl
-import com.junemon.compose_stable.util.timer.BoxingTimer
-import com.junemon.compose_stable.util.timer.BoxingTimerImpl
+import com.junemon.compose_stable.util.timer.TimerHelper
+import com.junemon.compose_stable.util.timer.TimerHelperImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -18,11 +18,11 @@ import javax.inject.Singleton
  */
 @Module
 @InstallIn(SingletonComponent::class)
-interface BoxingTimerModule {
+interface IntervalTimerModule {
 
     @Binds
     @Singleton
-    fun bindsBoxingTimer(boxingTimerImpl: BoxingTimerImpl): BoxingTimer
+    fun bindsTimerHelper(boxingTimerImpl: TimerHelperImpl): TimerHelper
 
     @Binds
     @Singleton

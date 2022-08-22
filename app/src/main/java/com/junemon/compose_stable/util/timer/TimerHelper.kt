@@ -5,7 +5,7 @@ package com.junemon.compose_stable.util.timer
  * Github https://github.com/iandamping
  * Indonesia.
  */
-interface BoxingTimer {
+interface TimerHelper {
 
     fun startTimer(durationTime: Long, onFinish : () ->Unit, onTicking:(Long) ->Unit)
 

@@ -8,15 +8,14 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import com.junemon.compose_stable.screen.*
+import com.junemon.compose_stable.screen.IntervalTimerScreen
 import com.junemon.compose_stable.ui.theme.TimerTheme
-import com.junemon.compose_stable.util.TimerConstant
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val boxingVm: BoxingViewModel by viewModels()
+    private val boxingVm: IntervalTimerViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -25,10 +24,7 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
                     Column {
-                        SelectingRestRoundTimeAndRoundScreen(intervalVm = boxingVm)
-                        TimerScreen(intervalVm = boxingVm)
-                        WaringTimeRadioButton(intervalVm = boxingVm)
-                        IntervalTimerButton(intervalVm = boxingVm)
+                        IntervalTimerScreen(intervalVm = boxingVm)
                     }
                 }
             }
