@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -312,7 +313,10 @@ class IntervalTimerViewModel @Inject constructor(
     }
 
     fun setWhichRound(data: Int) {
-        _whichRoundValue.value = data
+        if (data == 16){
+            //set infinity
+            _whichRoundValue.value = Int.MAX_VALUE
+        } else _whichRoundValue.value = data
     }
 
     private fun resetWhichRound() {

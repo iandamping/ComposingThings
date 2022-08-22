@@ -79,7 +79,11 @@ private fun TimerText(modifier: Modifier = Modifier, intervalVm: IntervalTimerVi
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = stringResource(R.string.current_round, currentRound, whichRoundRunning),
+            text = stringResource(
+                if (whichRoundRunning == Int.MAX_VALUE) R.string.infinity_round else R.string.current_round,
+                currentRound,
+                whichRoundRunning
+            ),
             fontFamily = CalculatorFontFamily,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.h4,

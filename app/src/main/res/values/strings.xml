@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">ComposingThings</string>
     <string name="current_round">Round %d / %d</string>
+    <string name="infinity_round">Round &#8734;</string>
     <string name="rounds">Rounds</string>
     <string name="warning">SET WARNING TIME</string>
     <string name="off">OFF</string>
