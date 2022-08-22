@@ -17,19 +17,7 @@ import timber.log.Timber
  * Github https://github.com/iandamping
  * Indonesia.
  */
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    ComposingThingsTheme {
-        GreetingButton()
-    }
-}
+data class GenericPair<out A, out B>(val data1: A, val data2: B)
 
-@Composable
-fun GreetingButton() {
-    Button(onClick = {
-        Timber.e("Button clicked")
-    }) {
-        Text(text = "Start")
-    }
-}
+data class GenericTriple<out A, out B, out C>(val data1: A, val data2: B, val data3:C)
+

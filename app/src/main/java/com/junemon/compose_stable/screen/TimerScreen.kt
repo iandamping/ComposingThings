@@ -1,9 +1,12 @@
 package com.junemon.compose_stable.screen
 
 import android.text.format.DateUtils
+import android.widget.NumberPicker
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.progressSemantics
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -15,14 +18,18 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.junemon.compose_stable.BoxingViewModel
+import com.junemon.compose_stable.R
 import com.junemon.compose_stable.RestTime
-import com.junemon.compose_stable.TimerState
 import com.junemon.compose_stable.ui.theme.CalculatorFontFamily
 import com.junemon.compose_stable.util.TimerConstant
+import com.junemon.compose_stable.util.TimerConstant.DEFAULT_INTEGER_VALUE
 import com.junemon.compose_stable.util.TimerConstant.LIGHT_GREEN_1
 import com.junemon.compose_stable.util.TimerConstant.LIGHT_GREEN_2
 
@@ -35,12 +42,12 @@ import com.junemon.compose_stable.util.TimerConstant.LIGHT_GREEN_2
 
 @Composable
 fun TimerScreen(
-    timerViewModel: BoxingViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    intervalVm: BoxingViewModel,
 ) {
 
-    val timeTickingForText by timerViewModel.currentTime.observeAsState()
-    val timeTickingForDialog by timerViewModel.currentTimeInFloat.observeAsState()
+    val timeTickingForText by intervalVm.currentTime.collectAsState()
+    val timeTickingForDialog by intervalVm.currentTimeInFloat.observeAsState()
 
     Box(
         modifier = modifier,
@@ -133,34 +140,38 @@ fun UnderlyingCircle() {
 }
 
 @Composable
-fun RestTimeRadioButton(
+fun WaringTimeRadioButton(
     modifier: Modifier = Modifier,
-    isRadioButtonEnabled: Boolean,
-    item: List<RestTime>,
-    itemSelected: (Int) -> Unit
+    intervalVm: BoxingViewModel
 ) {
-    val (selectedOption, onOptionSelected) = remember { mutableStateOf(item[0]) }
-//    val state = rememberScrollState()
-//    LaunchedEffect(Unit) { state.animateScrollTo(100) }
+    val listOfRestTime = listOf(
+        RestTime(stringResource(id = R.string.off), 0),
+        RestTime(stringResource(id = R.string.ten_second), 10),
+        RestTime(stringResource(id = R.string.thirty_sec), 30),
+    )
+    val (selectedOption, onOptionSelected) = remember { mutableStateOf(listOfRestTime[0]) }
+
+    val isRadioButtonEnabled by intervalVm.isTimerRunning.observeAsState(initial = false)
 
     Column(
-        modifier = modifier.
-            fillMaxWidth()
-            .padding(12.dp)
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(12.dp),
     ) {
         Text(
-            text = "Pick how long to rest",
+            text = stringResource(id = R.string.warning),
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(top = 8.dp, bottom = 8.dp)
         )
+
         Row(
             modifier = modifier
                 .fillMaxWidth()
                 .height(50.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            item.forEach { text ->
+            listOfRestTime.forEach { text ->
                 Row(
                     Modifier
                         .wrapContentWidth()
@@ -170,7 +181,7 @@ fun RestTimeRadioButton(
                             selected = (text == selectedOption),
                             onClick = {
                                 onOptionSelected(text)
-                                itemSelected(text.time)
+                                intervalVm.setWarningValue(text.time)
                             },
                             enabled = !isRadioButtonEnabled
                         )
@@ -189,7 +200,7 @@ fun RestTimeRadioButton(
                             // inide on click method we are setting a
                             // selected option of our radio buttons.
                             onOptionSelected(text)
-                            itemSelected(text.time)
+                            intervalVm.setWarningValue(text.time)
                         },
                         enabled = !isRadioButtonEnabled
                     )
@@ -209,84 +220,102 @@ fun RestTimeRadioButton(
 }
 
 @Composable
-fun StartTimerButton(buttonClicked: () -> Unit) {
-    Button(onClick = buttonClicked) {
-        Text(text = "Start")
-    }
-}
-
-@Composable
-fun PauseTimerButton(buttonClicked: () -> Unit) {
-    Button(onClick = buttonClicked) {
-        Text(text = "Pause")
-    }
-}
-
-@Composable
-fun ResetTimerButton(buttonClicked: () -> Unit) {
-    Button(onClick = buttonClicked) {
-        Text(text = "Reset")
-    }
-}
-
-@Composable
-fun TimerController(
-    timerViewModel: BoxingViewModel,
-    isTimerRunning: Boolean,
-    pauseTime: Long?,
-    restTime: Int,
-    timerState: TimerState?,
+fun SelectingRestRoundTimeAndRoundScreen(
+    modifier: Modifier = Modifier,
+    intervalVm: BoxingViewModel
 ) {
-    if (isTimerRunning) {
-        when (timerState) {
-            is TimerState.RestTime -> {
-                if (pauseTime != null) {
-                    timerViewModel.startTimer(
-                        durationTime = pauseTime.toInt() * TimerConstant.ONE_SECOND,
-                        durationTimes = TimerConstant.setCustomMinutes(restTime),
-                        finishTicking = {
-                            with(timerViewModel) {
-                                startRoundSound()
-                                setRoundTimeState(25)
-                            }
-                        })
-                } else {
-                    timerViewModel.startTimer(
-                        durationTime = timerState.time,
-                        durationTimes = null,
-                        finishTicking = {
-                            with(timerViewModel) {
-                                startRoundSound()
-                                setRoundTimeState(25)
-                            }
-                        })
+    val restArray = stringArrayResource(id = R.array.arr_rest_time)
+    val roundTimeArray = stringArrayResource(id = R.array.arr_round_time)
+    val roundsArray = stringArrayResource(id = R.array.arr_rounds)
+    val pickerTheme = R.style.AppTheme_Picker
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .height(300.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = stringResource(id = R.string.rest), color = Color.White)
+            AndroidView(factory = {
+                NumberPicker(android.view.ContextThemeWrapper(it, pickerTheme)).apply {
+                    if (value == DEFAULT_INTEGER_VALUE) {
+                        intervalVm.setRestTime(TimerConstant.setCustomTime(0))
+                    }
+                    minValue = DEFAULT_INTEGER_VALUE
+                    maxValue = restArray.size - 1
+                    displayedValues = restArray
+                    setOnValueChangedListener { _, _, newVal ->
+                        when (newVal) {
+                            0 -> intervalVm.setRestTime(TimerConstant.setCustomTime(0))
+                            1 -> intervalVm.setRestTime(TimerConstant.setCustomTime(15))
+                            2 -> intervalVm.setRestTime(TimerConstant.setCustomTime(30))
+                            3 -> intervalVm.setRestTime(TimerConstant.setCustomTime(60))
+                            4 -> intervalVm.setRestTime(TimerConstant.setCustomTime(90))
+                            5 -> intervalVm.setRestTime(TimerConstant.setCustomTime(120))
+                            6 -> intervalVm.setRestTime(TimerConstant.setCustomTime(150))
+                            7 -> intervalVm.setRestTime(TimerConstant.setCustomTime(180))
+                        }
+                    }
                 }
-            }
-            is TimerState.RoundTime -> {
-                if (pauseTime != null) {
-                    timerViewModel.startTimer(
-                        durationTime = pauseTime.toInt() * TimerConstant.ONE_SECOND,
-                        durationTimes = TimerConstant.setCustomMinutes(25),
-                        finishTicking = {
-                            with(timerViewModel) {
-                                endRoundSound()
-                                incrementPomodoroRound()
-                                setRestTimeState(restTime)
-                            }
-                        })
-                } else {
-                    timerViewModel.startTimer(durationTime = timerState.time,
-                        durationTimes = null,
-                        finishTicking = {
-                            with(timerViewModel) {
-                                endRoundSound()
-                                incrementPomodoroRound()
-                                setRestTimeState(restTime)
-                            }
-                        })
-                }
-            }
+            })
         }
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = stringResource(id = R.string.round_time), color = Color.White)
+
+            AndroidView(factory = {
+                NumberPicker(android.view.ContextThemeWrapper(it, pickerTheme)).apply {
+                    intervalVm.setRoundTime(value)
+                    minValue = DEFAULT_INTEGER_VALUE
+                    maxValue = roundTimeArray.size - 1
+                    displayedValues = roundTimeArray
+                    setOnValueChangedListener { _, _, newVal ->
+                        intervalVm.setRoundTime(newVal)
+                    }
+                }
+            })
+        }
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = stringResource(id = R.string.rounds), color = Color.White)
+
+            AndroidView(factory = {
+                NumberPicker(android.view.ContextThemeWrapper(it, pickerTheme)).apply {
+                    intervalVm.setWhichRound(value + 1)
+                    minValue = DEFAULT_INTEGER_VALUE
+                    maxValue = roundsArray.size - 1
+                    displayedValues = roundsArray
+                    setOnValueChangedListener { _, _, newVal ->
+                        intervalVm.setWhichRound(newVal + 1)
+                    }
+                }
+            })
+        }
+    }
+}
+
+@Composable
+fun IntervalTimerButton(modifier: Modifier = Modifier, intervalVm: BoxingViewModel) {
+    val state by intervalVm.isTimerRunning.observeAsState(initial = false)
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Button(onClick = { intervalVm.startCounting() }, enabled = !state) {
+            Text(text = stringResource(id = R.string.start))
+        }
+
+        Button(onClick = { intervalVm.cancelAllTimer() }, enabled = state) {
+            Text(text = stringResource(id = R.string.stop))
+        }
+
+        Button(onClick = { intervalVm.resetAll() }) {
+            Text(text = stringResource(id = R.string.reset))
+        }
+
+
     }
 }
 

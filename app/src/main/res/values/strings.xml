@@ -1,3 +1,57 @@
 <resources>
     <string name="app_name">ComposingThings</string>
+    <string name="rounds">Rounds</string>
+    <string name="warning">WARNING TIME</string>
+    <string name="off">OFF</string>
+    <string name="ten_second">10 SEC</string>
+    <string name="thirty_sec">30 SEC</string>
+    <string name="reset">RESET</string>
+    <string name="start">START</string>
+    <string name="stop">STOP</string>
+    <string name="rest">Rest</string>
+    <string name="round_time">Round Time</string>
+
+    <string-array name="arr_rest_time">
+        <item>0 sec</item>
+        <item>15 sec</item>
+        <item>30 sec</item>
+        <item>60 sec</item>
+        <item>90 sec</item>
+        <item>120 sec</item>
+        <item>150 sec</item>
+        <item>180 sec</item>
+    </string-array>
+
+    <string-array name="arr_round_time">
+        <item>30 sec</item>
+        <item>1 min</item>
+        <item>2 min</item>
+        <item>3 min</item>
+        <item>4 min</item>
+        <item>5 min</item>
+        <item>6 min</item>
+        <item>7 min</item>
+        <item>8 min</item>
+        <item>9 min</item>
+        <item>10 min</item>
+    </string-array>
+
+    <string-array name="arr_rounds">
+        <item>Round 1</item>
+        <item>Round 2</item>
+        <item>Round 3</item>
+        <item>Round 4</item>
+        <item>Round 5</item>
+        <item>Round 6</item>
+        <item>Round 7</item>
+        <item>Round 8</item>
+        <item>Round 9</item>
+        <item>Round 10</item>
+        <item>Round 11</item>
+        <item>Round 12</item>
+        <item>Round 13</item>
+        <item>Round 14</item>
+        <item>Round 15</item>
+        <item>Round &#8734;</item>
+    </string-array>
 </resources>

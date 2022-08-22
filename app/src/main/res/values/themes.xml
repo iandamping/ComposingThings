@@ -22,4 +22,10 @@
     <style name="Theme.ComposingThings.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.ComposingThings.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="AppTheme.Picker" parent="Theme.AppCompat.Light.NoActionBar" >
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="colorControlNormal">@color/teal_200</item>
+    </style>
+
 </resources>

@@ -14,9 +14,9 @@ import timber.log.Timber
 object TimerConstant {
     const val MY_REQUEST_CODE: Int = 0
     const val IMMERSIVE_FLAG_TIMEOUT = 500L
-
+    const val DEFAULT_ROUND_COUNTER_VALUE = 1
     const val DEFAULT_INTEGER_VALUE = 0
-    const val DEFAULT_POMODORO_ROUND = 1
+    const val DEFAULT_WHICH_ROUND_COUNTER_VALUE = 1
     const val MAX_POMODORO_ROUND = 4
     const val DEFAULT_LONG_VALUE = 0L
     const val ROUND_TIME_STATE = 0
@@ -36,9 +36,9 @@ object TimerConstant {
     val DARK_GREEN_1 = Color(0xFF005D57)
     val DARK_GREEN_2 = Color(0xFF004940)
     val listOfRestTime = listOf<RestTime>(
-            RestTime("3 Minute", 3),
-            RestTime("5 Minute", 5),
-            RestTime("10 Minute", 10),
+            RestTime("OFF", 0),
+            RestTime("10 SEC", 10),
+            RestTime("30 SEC", 30),
     )
 
     fun setCustomMinutes(data: Int) = data * 60 * 1000L
