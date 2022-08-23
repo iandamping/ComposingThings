@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -50,30 +49,29 @@ class IntervalTimerViewModel @Inject constructor(
 
     private var _isResting: MutableLiveData<Boolean> = MutableLiveData()
     val isResting: LiveData<Boolean> get() = _isResting
-    private var _clockTicking: MutableLiveData<String?> = MutableLiveData(null)
-    val clockTicking: LiveData<String?> get() = _clockTicking
+
     private var _roundCounter: MutableLiveData<Int> = MutableLiveData(DEFAULT_ROUND_COUNTER_VALUE)
     val roundCounter: LiveData<Int> get() = _roundCounter
 
-    val roundTimeState: StateFlow<Int>
+    private val roundTimeState: StateFlow<Int>
         get() = _roundTimeState
 
-    val warningValue: StateFlow<Int>
+    private val warningValue: StateFlow<Int>
         get() = _warningValue.asStateFlow()
 
     val currentTime: StateFlow<Long?>
         get() = _currentTime
 
-    val pausedTime: LiveData<Long>
+    private val pausedTime: LiveData<Long>
         get() = _pausedTime
 
     val isTimerRunning: LiveData<Boolean>
         get() = _isTimerRunning
 
-    val restTimeValue: LiveData<Int>
+    private val restTimeValue: LiveData<Int>
         get() = _restTimeValue
 
-    val roundTimeValue: LiveData<Int>
+    private val roundTimeValue: LiveData<Int>
         get() = _roundTimeValue
 
     val whichRoundValue: LiveData<Int>
@@ -84,7 +82,7 @@ class IntervalTimerViewModel @Inject constructor(
     }
 
     fun startCounting() {
-        setTimmerIsRunning(true)
+
         when (roundTimeState.value) {
             ROUND_TIME_STATE -> {
                 if (pausedTime.value?.toInt() != DEFAULT_INTEGER_VALUE) {
@@ -143,7 +141,6 @@ class IntervalTimerViewModel @Inject constructor(
                     ROUND_TIME_STATE -> {
                         it.data2?.let { timeTicking ->
                             val value = DateUtils.formatElapsedTime(timeTicking)
-                            setClockTicking(value)
                             setResting(false)
 
                             if (it.data3 != DEFAULT_INTEGER_VALUE) {
@@ -157,7 +154,6 @@ class IntervalTimerViewModel @Inject constructor(
                     REST_TIME_STATE -> {
                         it.data2?.let { timeTicking ->
                             val value = DateUtils.formatElapsedTime(timeTicking)
-                            setClockTicking(value)
 
                             if (value != "00:00") {
                                 setResting(true)
@@ -173,11 +169,13 @@ class IntervalTimerViewModel @Inject constructor(
         durationTime: Long,
         finishTicking: () -> Unit
     ) {
+        setTimerIsRunning(true)
         timerHelper.startTimer(durationTime = durationTime,
             onFinish = {
                 setCurrentTime(DONE)
                 setPauseTime(DONE)
                 finishTicking.invoke()
+                setTimerIsRunning(false)
             }, onTicking = { millisUntilFinished ->
                 setCurrentTime((millisUntilFinished / ONE_SECOND))
                 setPauseTime((millisUntilFinished / ONE_SECOND))
@@ -251,14 +249,13 @@ class IntervalTimerViewModel @Inject constructor(
         resetRoundTime()
         resetRestTime()
         resetRoundCounter()
-        resetClockTicking()
         resetPauseTime()
         resetResting()
         resetWhichRound()
         cancelAllTimer()
         setCurrentTime(DONE)
         setPauseTime(DONE)
-        setTimmerIsRunning(false)
+        setTimerIsRunning(false)
         setIsRoundTimeRunning(ROUND_TIME_STATE)
         resetWarningValue()
     }
@@ -295,14 +292,6 @@ class IntervalTimerViewModel @Inject constructor(
         _roundCounter.value = DEFAULT_ROUND_COUNTER_VALUE
     }
 
-    private fun setClockTicking(data: String?) {
-        _clockTicking.value = data
-    }
-
-    private fun resetClockTicking() {
-        _clockTicking.value = null
-    }
-
 
     private fun setResting(data: Boolean) {
         _isResting.value = data
@@ -331,7 +320,7 @@ class IntervalTimerViewModel @Inject constructor(
         _warningValue.value = DEFAULT_INTEGER_VALUE
     }
 
-    private fun setTimmerIsRunning(data: Boolean) {
+    private fun setTimerIsRunning(data: Boolean) {
         _isTimerRunning.value = data
     }
 

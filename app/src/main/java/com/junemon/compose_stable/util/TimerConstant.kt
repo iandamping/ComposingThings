@@ -3,7 +3,7 @@ package com.junemon.compose_stable.util
 import android.view.View
 import androidx.compose.ui.graphics.Color
 import com.junemon.compose_stable.RestTime
-import timber.log.Timber
+import kotlinx.coroutines.CompletableDeferred
 
 /**
  * Created by Ian Damping on 18,October,2019
@@ -36,38 +36,41 @@ object TimerConstant {
     val DARK_GREEN_1 = Color(0xFF005D57)
     val DARK_GREEN_2 = Color(0xFF004940)
     val listOfRestTime = listOf<RestTime>(
-            RestTime("OFF", 0),
-            RestTime("10 SEC", 10),
-            RestTime("30 SEC", 30),
+        RestTime("OFF", 0),
+        RestTime("10 SEC", 10),
+        RestTime("30 SEC", 30),
     )
+
+    fun setCustomHour(data: Int) = data * 3600 * 1000L
 
     fun setCustomMinutes(data: Int) = data * 60 * 1000L
 
-    fun setCustomSeconds(data: Int) = data % 60 * 1000L
+    fun setCustomSeconds(data: Int) = data * 1000L
 
     fun setCustomTime(data: Int) = data * 1000L
 
-    fun setCustomFloat(data: Long, ticking: Long):Float = when (data) {
-        1 * 60 * 1000L -> 1 - (ticking.toFloat() / 60)
-        2 * 60 * 1000L -> 1 - (ticking.toFloat() / 120)
-        3 * 60 * 1000L -> 1 - (ticking.toFloat() / 180)
-        4 * 60 * 1000L -> 1 - (ticking.toFloat() / 240)
-        5 * 60 * 1000L -> 1 - (ticking.toFloat() / 300)
-        6 * 60 * 1000L -> 1 - (ticking.toFloat() / 360)
-        7 * 60 * 1000L -> 1 - (ticking.toFloat() / 420)
-        8 * 60 * 1000L -> 1 - (ticking.toFloat() / 480)
-        9 * 60 * 1000L -> 1 - (ticking.toFloat() / 540)
-        10 * 60 * 1000L -> 1 - (ticking.toFloat() / 600)
-        25 * 60 * 1000L -> 1 - (ticking.toFloat() / 1500)
-        else -> 1 - (ticking.toFloat() / 1500)
+    suspend fun setMapTimeToFloat(data: Long?, ticking: Long):Float{
+        val results: CompletableDeferred<Float> = CompletableDeferred()
+        if (data!=null){
+            for (i in 0..59){
+                when(data){
+                    i*1000L -> results.complete(1 - (ticking.toFloat() / i))
+                    i* 60 * 1000L -> results.complete(1 - (ticking.toFloat() / (i*60)))
+                    i* 3600 * 1000L -> results.complete(1 - (ticking.toFloat() / (i*3600)))
+                }
+            }
+        } else results.complete(0F)
+
+        return results.await()
     }
+
 
     /** Combination of all flags required to put activity into immersive mode */
     const val FLAGS_FULLSCREEN =
-            View.SYSTEM_UI_FLAG_LOW_PROFILE or
-                    View.SYSTEM_UI_FLAG_FULLSCREEN or
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
-                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+        View.SYSTEM_UI_FLAG_LOW_PROFILE or
+                View.SYSTEM_UI_FLAG_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
 }
