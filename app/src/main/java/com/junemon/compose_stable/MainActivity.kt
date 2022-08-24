@@ -9,12 +9,14 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import com.junemon.compose_stable.screen.BasicTimerScreen
 import com.junemon.compose_stable.screen.IntervalTimerScreen
+import com.junemon.compose_stable.screen.StopwatchTimerScreen
 import com.junemon.compose_stable.ui.theme.TimerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    private val stopwatchVm: StopWatchViewModel by viewModels()
     private val boxingVm: IntervalTimerViewModel by viewModels()
     private val timerVm: BasicTimerViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,7 +26,8 @@ class MainActivity : ComponentActivity() {
             TimerTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
-                    BasicTimerScreen(timerVm = timerVm)
+                    StopwatchTimerScreen(stopwatchVm = stopwatchVm)
+//                    BasicTimerScreen(timerVm = timerVm)
 //                    IntervalTimerScreen(intervalVm = boxingVm)
                 }
             }
