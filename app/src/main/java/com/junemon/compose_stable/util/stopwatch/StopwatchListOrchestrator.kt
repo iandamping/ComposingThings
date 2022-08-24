@@ -6,6 +6,8 @@ interface StopwatchListOrchestrator {
 
     val ticker: StateFlow<String>
 
+    val isTimerRunning: StateFlow<Boolean>
+
     fun start()
 
     fun pause()

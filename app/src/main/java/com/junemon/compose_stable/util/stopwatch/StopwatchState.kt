@@ -5,6 +5,7 @@ sealed class StopwatchState {
         val startTime: Long,
         val elapsedTime: Long
     ) : StopwatchState()
+
     data class Paused(
         val elapsedTime: Long
     ) : StopwatchState()

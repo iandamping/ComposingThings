@@ -1,6 +1,8 @@
 package com.junemon.compose_stable.screen
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -19,12 +21,18 @@ import com.junemon.compose_stable.ui.theme.CalculatorFontFamily
 
 @Composable
 fun StopwatchTimerScreen(modifier: Modifier = Modifier, stopwatchVm: StopWatchViewModel) {
-    Column(modifier = modifier.fillMaxSize()) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.Center,
+    ) {
         StopwatchTimerText(
             stopwatchVm = stopwatchVm
         )
         StopwatchTimerButton(stopwatchVm = stopwatchVm)
     }
+
 }
 
 
@@ -36,7 +44,7 @@ private fun StopwatchTimerText(modifier: Modifier = Modifier, stopwatchVm: StopW
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .height(350.dp),
+            .height(200.dp),
         contentAlignment = Alignment.Center
     ) {
 
@@ -54,20 +62,45 @@ private fun StopwatchTimerText(modifier: Modifier = Modifier, stopwatchVm: StopW
 
 @Composable
 fun StopwatchTimerButton(modifier: Modifier = Modifier, stopwatchVm: StopWatchViewModel) {
+    val isTimerRunning by stopwatchVm.isTimerRunning.collectAsState()
+
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Button(onClick = { stopwatchVm.start() }) {
-            Text(text = stringResource(id = R.string.start))
+        Button(onClick = {
+            if (isTimerRunning) {
+                stopwatchVm.pause()
+            } else {
+                stopwatchVm.start()
+            }
+        }) {
+            Text(
+                text = if (isTimerRunning) {
+                    stringResource(id = R.string.pause)
+                } else {
+                    stringResource(id = R.string.start)
+                }
+            )
         }
 
-        Button(onClick = { stopwatchVm.pause() }) {
-            Text(text = stringResource(id = R.string.pause))
+        Button(onClick = {
+            if (isTimerRunning) {
+                stopwatchVm.lap()
+            } else {
+                stopwatchVm.stop()
+            }
+        }) {
+            Text(
+                text = if (isTimerRunning) {
+                    stringResource(id = R.string.lap)
+                } else {
+                    stringResource(id = R.string.stop)
+                }
+            )
         }
 
-        Button(onClick = { stopwatchVm.stop() }) {
-            Text(text = stringResource(id = R.string.stop))
-        }
     }
 }
+
+

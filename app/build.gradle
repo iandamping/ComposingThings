@@ -95,4 +95,9 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:4.7.1'
     //Klock
     implementation "com.soywiz.korlibs.klock:klock-jvm:3.0.0"
+    //room
+    //db
+    implementation "androidx.room:room-runtime:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
 }

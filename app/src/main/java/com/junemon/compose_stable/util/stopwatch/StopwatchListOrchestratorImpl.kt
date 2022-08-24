@@ -1,6 +1,5 @@
 package com.junemon.compose_stable.util.stopwatch
 
-import com.junemon.compose_stable.di.dispatcher.BackgroundDispatcherQualifier
 import com.junemon.compose_stable.di.dispatcher.DefaultApplicationCoroutineScope
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,13 +12,17 @@ class StopwatchListOrchestratorImpl @Inject constructor(
     @DefaultApplicationCoroutineScope private val scope: CoroutineScope,
 ) : StopwatchListOrchestrator {
     private var job: Job? = null
-    private val mutableTicker = MutableStateFlow("")
+    private val mutableTicker = MutableStateFlow("00:00:000")
+    private val mutableIsTimerRunning = MutableStateFlow(false)
 
+    override val isTimerRunning: StateFlow<Boolean>
+        get() = mutableIsTimerRunning.asStateFlow()
 
     override val ticker: StateFlow<String> = mutableTicker.asStateFlow()
 
     override fun start() {
         if (job == null) startJob()
+        mutableIsTimerRunning.value = true
         stopwatchStateHolder.start()
     }
 
@@ -33,11 +36,13 @@ class StopwatchListOrchestratorImpl @Inject constructor(
     }
 
     override fun pause() {
+        mutableIsTimerRunning.value = false
         stopwatchStateHolder.pause()
         stopJob()
     }
 
     override fun stop() {
+        mutableIsTimerRunning.value = false
         stopwatchStateHolder.stop()
         stopJob()
         clearValue()
@@ -49,6 +54,6 @@ class StopwatchListOrchestratorImpl @Inject constructor(
     }
 
     private fun clearValue() {
-        mutableTicker.value = ""
+        mutableTicker.value = "00:00:000"
     }
 }
