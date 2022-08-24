@@ -1,16 +1,19 @@
 package com.junemon.compose_stable
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.junemon.compose_stable.repository.StopwatchRepository
 import com.junemon.compose_stable.util.stopwatch.StopwatchListOrchestrator
-import com.permatabank.qram.core.data.datasource.cache.preference.PreferenceHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import timber.log.Timber
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class StopWatchViewModel @Inject constructor(
-    private val preferenceHelper: PreferenceHelper,
+    private val repository: StopwatchRepository,
     private val stopwatchListOrchestrator: StopwatchListOrchestrator
 ) :
     ViewModel() {
@@ -18,6 +21,12 @@ class StopWatchViewModel @Inject constructor(
     val stopwatchTimer: StateFlow<String> = stopwatchListOrchestrator.ticker
 
     val isTimerRunning: StateFlow<Boolean> = stopwatchListOrchestrator.isTimerRunning
+
+    val lapTimeList: StateFlow<List<String>> = repository.loadLapTime().stateIn(
+        initialValue = emptyList(),
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000)
+    )
 
     fun start() {
         stopwatchListOrchestrator.start()
@@ -32,7 +41,15 @@ class StopWatchViewModel @Inject constructor(
     }
 
     fun lap() {
-        Timber.e("value : ${stopwatchTimer.value}")
+        viewModelScope.launch {
+            repository.insertLapTime(stopwatchTimer.value)
+        }
+    }
+
+    fun deleteAllLapItem(){
+        viewModelScope.launch {
+            repository.deleteAllLapTime()
+        }
     }
 
 

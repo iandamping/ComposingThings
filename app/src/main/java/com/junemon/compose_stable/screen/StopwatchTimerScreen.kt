@@ -1,9 +1,10 @@
 package com.junemon.compose_stable.screen
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Button
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -18,19 +19,40 @@ import androidx.compose.ui.unit.dp
 import com.junemon.compose_stable.R
 import com.junemon.compose_stable.StopWatchViewModel
 import com.junemon.compose_stable.ui.theme.CalculatorFontFamily
+import com.junemon.compose_stable.ui.theme.Teal200
 
 @Composable
 fun StopwatchTimerScreen(modifier: Modifier = Modifier, stopwatchVm: StopWatchViewModel) {
+    val listOfLapItem by stopwatchVm.lapTimeList.collectAsState()
     Column(
         modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Center,
     ) {
         StopwatchTimerText(
             stopwatchVm = stopwatchVm
         )
         StopwatchTimerButton(stopwatchVm = stopwatchVm)
+
+        LazyColumn(modifier = Modifier
+            .padding(top = 8.dp)
+            .fillMaxWidth()) {
+            itemsIndexed(listOfLapItem) { key, singleItem ->
+                Divider(color = Teal200)
+
+                Row(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = stringResource(id = R.string.lap_number, (key + 1).toString()))
+                    Text(text = singleItem)
+                }
+
+            }
+        }
+
     }
 
 }
@@ -89,13 +111,14 @@ fun StopwatchTimerButton(modifier: Modifier = Modifier, stopwatchVm: StopWatchVi
                 stopwatchVm.lap()
             } else {
                 stopwatchVm.stop()
+                stopwatchVm.deleteAllLapItem()
             }
         }) {
             Text(
                 text = if (isTimerRunning) {
                     stringResource(id = R.string.lap)
                 } else {
-                    stringResource(id = R.string.stop)
+                    stringResource(id = R.string.reset)
                 }
             )
         }
